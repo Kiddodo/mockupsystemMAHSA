@@ -1047,15 +1047,60 @@ function updateSessionLabel(){
   const sl={'SEP2026':'Internship September 2026','MAR2026':'Internship March 2026','SEP2025':'Internship September 2025'};
   document.getElementById('coord-session-label').textContent=(sl[ST.session]||ST.session)+' — '+(ST.program==='ALL'?'All Programs':ST.program);
 }
+function isDeadlinePassed(){
+  const dl=new Date(ST.deadline+'T23:59:59');
+  return dl < new Date();
+}
+
+function isUploadLocked(){
+  return ST.autoLock && isDeadlinePassed();
+}
+
+function updateCoordinatorLockBadge(){
+  const b=document.getElementById('lock-status-badge');
+  if(!b) return;
+  if(ST.autoLock && isDeadlinePassed()){
+    b.className='lock-status locked';
+    b.style.background='';
+    b.style.color='';
+    b.innerHTML='<i class="fas fa-lock"></i> Uploads Locked (Deadline Passed)';
+  } else if(ST.autoLock){
+    b.className='lock-status unlocked';
+    b.style.background='var(--mb-pale)';
+    b.style.color='var(--mb)';
+    b.innerHTML='<i class="fas fa-shield-alt"></i> Auto-Lock Active (Locks at Deadline)';
+  } else {
+    b.className='lock-status unlocked';
+    b.style.background='';
+    b.style.color='';
+    b.innerHTML='<i class="fas fa-lock-open"></i> Uploads Open';
+  }
+}
+
 function updateDeadline(){
   ST.deadline=document.getElementById('deadline-picker').value;
-  showToast('Deadline updated to '+fmtDate(ST.deadline),'success');
+  updateCoordinatorLockBadge();
+  if(ST.autoLock && isDeadlinePassed()){
+    showToast('Deadline set to past date — uploads are now locked!','warning');
+  } else {
+    showToast('Deadline updated to '+fmtDate(ST.deadline),'success');
+  }
+  if(ST.currentRole==='student') renderStudentPortal();
 }
+
 function toggleAutoLock(){
   ST.autoLock=document.getElementById('auto-lock-toggle').checked;
-  const b=document.getElementById('lock-status-badge');
-  if(ST.autoLock){b.className='lock-status locked';b.innerHTML='<i class="fas fa-lock"></i> Uploads Locked';showToast('Auto Lock enabled — student uploads disabled.','warning');}
-  else{b.className='lock-status unlocked';b.innerHTML='<i class="fas fa-lock-open"></i> Uploads Open';showToast('Auto Lock disabled — uploads reopened.','info');}
+  updateCoordinatorLockBadge();
+  if(ST.autoLock){
+    if(isDeadlinePassed()){
+      showToast('Auto Lock enabled: Deadline has passed, student uploads are locked.','warning');
+    } else {
+      showToast('Auto Lock armed: Uploads will lock automatically on '+fmtDate(ST.deadline)+'.','info');
+    }
+  } else {
+    showToast('Auto Lock disabled — student uploads reopened.','info');
+  }
+  if(ST.currentRole==='student') renderStudentPortal();
 }
 
 /* LECTURER TABLE */
@@ -1254,7 +1299,7 @@ function closeGradingSuccess(){closeModal('grade-success-modal');closeGrading();
 
 /* STUDENT PORTAL */
 function renderStudentPortal(){
-  const isLocked=ST.autoLock;
+  const isLocked=isUploadLocked();
   const b=document.getElementById('lock-banner');
   b.style.display=isLocked?'flex':'none';
   document.getElementById('upload-grid').innerHTML=CARD_CONFIG.map(card=>{
@@ -1300,9 +1345,24 @@ function updateCountdown(){
   const dl=new Date(ST.deadline+'T23:59:59');
   const now=new Date();const diff=dl-now;
   const box=document.getElementById('student-countdown-box');
-  document.getElementById('deadline-display').textContent='Deadline: '+fmtDate(ST.deadline);
-  if(diff<=0){['days','hours','mins','secs'].forEach(id=>document.getElementById('cd-'+id).textContent='00');box.classList.add('overdue');return;}
-  box.classList.remove('overdue');
+  const dlDisplay=document.getElementById('deadline-display');
+  if(dlDisplay) dlDisplay.textContent='Deadline: '+fmtDate(ST.deadline);
+  
+  if(diff<=0){
+    ['days','hours','mins','secs'].forEach(id=>{
+      const el=document.getElementById('cd-'+id);
+      if(el) el.textContent='00';
+    });
+    const wasOverdue = box && box.classList.contains('overdue');
+    if(box) box.classList.add('overdue');
+    // If deadline just passed and auto-lock is on, dynamically lock student uploads live
+    if(ST.autoLock && !wasOverdue){
+      renderStudentPortal();
+      updateCoordinatorLockBadge();
+    }
+    return;
+  }
+  if(box) box.classList.remove('overdue');
   document.getElementById('cd-days').textContent=String(Math.floor(diff/86400000)).padStart(2,'0');
   document.getElementById('cd-hours').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
   document.getElementById('cd-mins').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
