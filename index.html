@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -22,21 +22,50 @@
 html{font-size:15px}
 body{font-family:'Nunito',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;overflow-x:hidden}
 
-/* LANDING */
-#landing{min-height:100vh;background:linear-gradient(135deg,var(--mb-dark) 0%,var(--mb) 50%,var(--mb-light) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden}
-#landing::before{content:'';position:absolute;width:600px;height:600px;background:rgba(255,255,255,.04);border-radius:50%;top:-200px;right:-150px}
-.landing-logo{display:flex;align-items:center;gap:1rem;margin-bottom:.5rem;z-index:1}
-.logo-icon{width:60px;height:60px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:var(--mb);font-weight:900;box-shadow:var(--shl)}
-.logo-text h1{font-size:1.6rem;font-weight:800;color:white}
-.logo-text p{font-size:.8rem;color:rgba(255,255,255,.7);font-weight:500;letter-spacing:1px;text-transform:uppercase}
-.landing-subtitle{color:rgba(255,255,255,.75);font-size:1rem;margin-bottom:3rem;z-index:1;font-weight:500}
-.role-cards{display:flex;gap:1.5rem;z-index:1;flex-wrap:wrap;justify-content:center;max-width:900px}
-.role-card{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);border-radius:var(--rl);padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:all .3s ease;min-width:220px;flex:1;max-width:260px}
-.role-card:hover{background:rgba(255,255,255,.18);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.2);border-color:rgba(255,255,255,.4)}
-.role-card .ri{font-size:2.8rem;margin-bottom:1rem;display:block}
-.role-card h3{color:white;font-size:1.15rem;font-weight:700;margin-bottom:.4rem}
-.role-card p{color:rgba(255,255,255,.65);font-size:.82rem;line-height:1.5}
-.enter-btn{margin-top:1.2rem;background:white;color:var(--mb);border:none;border-radius:8px;padding:.55rem 1.4rem;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer}
+/* LOGIN PAGE */
+#landing{min-height:100vh;background:linear-gradient(135deg,var(--mb-dark) 0%,var(--mb) 55%,var(--mb-light) 100%);display:flex;flex-direction:row;align-items:stretch;overflow:hidden}
+#landing::before{content:'';position:absolute;width:700px;height:700px;background:rgba(255,255,255,.04);border-radius:50%;top:-200px;right:-150px;pointer-events:none}
+#landing::after{content:'';position:absolute;width:400px;height:400px;background:rgba(255,255,255,.03);border-radius:50%;bottom:-100px;left:-80px;pointer-events:none}
+.login-left{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:4rem 3rem;z-index:1}
+.login-left .brand{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem}
+.login-left .brand-icon{width:56px;height:56px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:var(--mb);box-shadow:var(--shl)}
+.login-left .brand-text h1{font-size:1.45rem;font-weight:800;color:white}
+.login-left .brand-text p{font-size:.78rem;color:rgba(255,255,255,.65);font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.login-left h2{font-size:2rem;font-weight:900;color:white;line-height:1.2;margin-bottom:.75rem;max-width:380px}
+.login-left .tagline{color:rgba(255,255,255,.65);font-size:.92rem;line-height:1.7;max-width:340px;margin-bottom:2.5rem}
+.login-feature{display:flex;align-items:center;gap:.75rem;margin-bottom:.9rem}
+.login-feature-icon{width:36px;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.login-feature p{color:rgba(255,255,255,.75);font-size:.84rem;font-weight:600}
+.login-right{width:440px;display:flex;align-items:center;justify-content:center;background:var(--g50);padding:2.5rem 2rem;z-index:1;flex-shrink:0}
+.login-card{width:100%;max-width:380px}
+.login-card-header{text-align:center;margin-bottom:2rem}
+.login-card-header h3{font-size:1.4rem;font-weight:800;color:var(--g800);margin-bottom:.3rem}
+.login-card-header p{font-size:.83rem;color:var(--g500);font-weight:500}
+.login-form .lf-field{margin-bottom:1rem}
+.login-form .lf-field label{display:block;font-size:.78rem;font-weight:700;color:var(--g600);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em}
+.login-form .lf-input-wrap{position:relative}
+.login-form .lf-input-wrap i{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--g400);font-size:.9rem;pointer-events:none}
+.login-form input,.login-form select{width:100%;padding:.65rem .85rem .65rem 2.4rem;border:1.5px solid var(--g200);border-radius:9px;font-family:'Nunito',sans-serif;font-size:.88rem;color:var(--g800);background:white;outline:none;transition:border .2s,box-shadow .2s}
+.login-form input:focus,.login-form select:focus{border-color:var(--mb);box-shadow:0 0 0 3px rgba(0,61,165,.1)}
+.login-form select{appearance:none;-webkit-appearance:none;padding-right:2rem}
+.lf-select-arrow{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);color:var(--g400);font-size:.75rem;pointer-events:none}
+.lf-pwd-toggle{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);color:var(--g400);font-size:.9rem;cursor:pointer;border:none;background:none;padding:0}
+.lf-pwd-toggle:hover{color:var(--g700)}
+.login-btn{width:100%;padding:.75rem;background:var(--mb);color:white;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.login-btn:hover{background:var(--mb-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,61,165,.3)}
+.login-btn:active{transform:none}
+.login-error{background:var(--err-l);border:1px solid #fca5a5;border-radius:8px;padding:.6rem .85rem;font-size:.8rem;font-weight:700;color:var(--err);margin-bottom:.85rem;display:none;align-items:center;gap:.5rem}
+.login-error.show{display:flex}
+.demo-creds{margin-top:1.5rem;border:1px solid var(--g200);border-radius:10px;overflow:hidden}
+.demo-creds-header{background:var(--g50);padding:.55rem .85rem;font-size:.73rem;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--g200);display:flex;align-items:center;gap:.4rem}
+.demo-cred-item{padding:.55rem .85rem;border-bottom:1px solid var(--g100);cursor:pointer;transition:background .15s}
+.demo-cred-item:last-child{border-bottom:none}
+.demo-cred-item:hover{background:var(--mb-pale)}
+.demo-cred-item .dc-role{font-size:.73rem;font-weight:800;color:var(--mb);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.15rem}
+.demo-cred-item .dc-info{font-size:.78rem;color:var(--g600);font-weight:600;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.demo-cred-item .dc-info code{background:var(--g100);padding:.05rem .35rem;border-radius:4px;font-size:.73rem;color:var(--g700);font-family:monospace}
+.login-footer{text-align:center;margin-top:1.25rem;font-size:.75rem;color:var(--g400);font-weight:500}
+@media(max-width:768px){#landing{flex-direction:column}.login-left{padding:2.5rem 1.5rem;align-items:center;text-align:center}.login-left h2{max-width:100%}.login-right{width:100%;padding:2rem 1.25rem}.login-feature{justify-content:center}}
 
 /* TOPBAR */
 .app-shell{display:none;flex-direction:column;min-height:100vh}
@@ -293,34 +322,106 @@ tbody tr:hover{background:var(--g50)}
 </head>
 <body>
 
-<!-- LANDING -->
+<!-- LOGIN PAGE -->
 <div id="landing">
-  <div class="landing-logo">
-    <div class="logo-icon">M</div>
-    <div class="logo-text"><h1>MAHSA University</h1><p>Internship Management System</p></div>
+  <!-- Left panel: branding & features -->
+  <div class="login-left">
+    <div class="brand">
+      <div class="brand-icon">M</div>
+      <div class="brand-text">
+        <h1>MAHSA University</h1>
+        <p>Internship Management System</p>
+      </div>
+    </div>
+    <h2>Managing Internships, Simplified.</h2>
+    <p class="tagline">A centralised platform for coordinators, lecturers, and students to seamlessly manage every stage of the internship programme.</p>
+    <div class="login-feature">
+      <div class="login-feature-icon">🏛️</div>
+      <p>Coordinator dashboard with roster management & deadline control</p>
+    </div>
+    <div class="login-feature">
+      <div class="login-feature-icon">👨‍🏫</div>
+      <p>Lecturer grading engine with digital rubric & signature</p>
+    </div>
+    <div class="login-feature">
+      <div class="login-feature-icon">🎓</div>
+      <p>Student submission portal with live deadline countdown</p>
+    </div>
   </div>
-  <p class="landing-subtitle">Select your role to access your personalised dashboard</p>
-  <div class="role-cards">
-    <div class="role-card" onclick="enterAs('coordinator')">
-      <span class="ri">🏛️</span>
-      <h3>Coordinator</h3>
-      <p>Manage internship programs, student rosters, deadlines and templates.</p>
-      <button class="enter-btn"><i class="fas fa-arrow-right"></i> Enter</button>
-    </div>
-    <div class="role-card" onclick="enterAs('lecturer')">
-      <span class="ri">👨‍🏫</span>
-      <h3>Lecturer / Supervisor</h3>
-      <p>Grade assigned students and submit evaluations through the grading engine.</p>
-      <button class="enter-btn"><i class="fas fa-arrow-right"></i> Enter</button>
-    </div>
-    <div class="role-card" onclick="enterAs('student')">
-      <span class="ri">🎓</span>
-      <h3>Student</h3>
-      <p>Submit internship documents, track progress, and view your grading results.</p>
-      <button class="enter-btn"><i class="fas fa-arrow-right"></i> Enter</button>
+
+  <!-- Right panel: login form -->
+  <div class="login-right">
+    <div class="login-card">
+      <div class="login-card-header">
+        <div style="width:48px;height:48px;background:var(--mb-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.4rem">🔐</div>
+        <h3>Welcome Back</h3>
+        <p>Sign in to your MAHSA IMS account</p>
+      </div>
+
+      <div class="login-error" id="login-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="login-error-msg">Invalid email or password. Please try again.</span>
+      </div>
+
+      <div class="login-form">
+        <!-- Role -->
+        <div class="lf-field">
+          <label>I am a</label>
+          <div class="lf-input-wrap">
+            <i class="fas fa-user-tag"></i>
+            <select id="login-role" onchange="onRoleChange()">
+              <option value="">— Select your role —</option>
+              <option value="coordinator">Coordinator</option>
+              <option value="lecturer">Lecturer / Supervisor</option>
+              <option value="student">Student</option>
+            </select>
+            <span class="lf-select-arrow"><i class="fas fa-chevron-down"></i></span>
+          </div>
+        </div>
+        <!-- Email -->
+        <div class="lf-field">
+          <label>Email Address</label>
+          <div class="lf-input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="you@mahsa.edu.my" autocomplete="email">
+          </div>
+        </div>
+        <!-- Password -->
+        <div class="lf-field">
+          <label>Password</label>
+          <div class="lf-input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password">
+            <button class="lf-pwd-toggle" onclick="togglePwd()" type="button" id="pwd-toggle-btn"><i class="fas fa-eye" id="pwd-eye-icon"></i></button>
+          </div>
+        </div>
+        <button class="login-btn" onclick="handleLogin()">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </div>
+
+      <!-- Demo Credentials -->
+      <div class="demo-creds">
+        <div class="demo-creds-header"><i class="fas fa-key"></i> Demo Credentials — click to auto-fill</div>
+        <div class="demo-cred-item" onclick="fillCreds('coordinator','coordinator@mahsa.edu.my','mahsa2026')">
+          <div class="dc-role">🏛️ Coordinator</div>
+          <div class="dc-info"><code>coordinator@mahsa.edu.my</code> · <code>mahsa2026</code></div>
+        </div>
+        <div class="demo-cred-item" onclick="fillCreds('lecturer','dr.rahman@mahsa.edu.my','lecturer123')">
+          <div class="dc-role">👨‍🏫 Lecturer / Supervisor</div>
+          <div class="dc-info"><code>dr.rahman@mahsa.edu.my</code> · <code>lecturer123</code></div>
+        </div>
+        <div class="demo-cred-item" onclick="fillCreds('student','abdul.halim@student.mahsa.edu.my','student123')">
+          <div class="dc-role">🎓 Student</div>
+          <div class="dc-info"><code>abdul.halim@student.mahsa.edu.my</code> · <code>student123</code></div>
+        </div>
+      </div>
+
+      <p class="login-footer"><i class="fas fa-shield-alt" style="color:var(--mb);margin-right:.3rem"></i> Secured by MAHSA University IT Services · 2026</p>
     </div>
   </div>
 </div>
+
 
 <!-- COORDINATOR -->
 <div id="coordinator-shell" class="app-shell">
@@ -780,12 +881,87 @@ function initStudents(){
 }
 
 /* NAV */
+/* ---- LOGIN CREDENTIALS ---- */
+const CREDS={
+  coordinator:{email:'coordinator@mahsa.edu.my',password:'mahsa2026',role:'coordinator'},
+  lecturer:   {email:'dr.rahman@mahsa.edu.my',   password:'lecturer123',role:'lecturer'},
+  student:    {email:'abdul.halim@student.mahsa.edu.my',password:'student123',role:'student'}
+};
+
+function fillCreds(role,email,password){
+  document.getElementById('login-role').value=role;
+  document.getElementById('login-email').value=email;
+  document.getElementById('login-password').value=password;
+  document.getElementById('login-error').classList.remove('show');
+  onRoleChange();
+}
+
+function onRoleChange(){
+  // Auto-fill email hint based on role selection
+  const role=document.getElementById('login-role').value;
+  const emailInput=document.getElementById('login-email');
+  if(role&&!emailInput.value){
+    const hints={coordinator:'coordinator@mahsa.edu.my',lecturer:'dr.rahman@mahsa.edu.my',student:'abdul.halim@student.mahsa.edu.my'};
+    emailInput.placeholder=hints[role]||'you@mahsa.edu.my';
+  }
+}
+
+function togglePwd(){
+  const inp=document.getElementById('login-password');
+  const icon=document.getElementById('pwd-eye-icon');
+  if(inp.type==='password'){inp.type='text';icon.className='fas fa-eye-slash';}
+  else{inp.type='password';icon.className='fas fa-eye';}
+}
+
+function handleLogin(){
+  const role    = document.getElementById('login-role').value;
+  const email   = document.getElementById('login-email').value.trim().toLowerCase();
+  const password= document.getElementById('login-password').value;
+  const errEl   = document.getElementById('login-error');
+  const errMsg  = document.getElementById('login-error-msg');
+  errEl.classList.remove('show');
+
+  // Validation
+  if(!role){errMsg.textContent='Please select your role.';errEl.classList.add('show');return;}
+  if(!email){errMsg.textContent='Please enter your email address.';errEl.classList.add('show');return;}
+  if(!password){errMsg.textContent='Please enter your password.';errEl.classList.add('show');return;}
+
+  // Credential check
+  const match=Object.values(CREDS).find(c=>c.email===email&&c.password===password&&c.role===role);
+  if(!match){
+    errMsg.textContent='Invalid email or password. Check the demo credentials below.';
+    errEl.classList.add('show');
+    document.getElementById('login-password').value='';
+    return;
+  }
+
+  // Animate button
+  const btn=document.querySelector('.login-btn');
+  btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+  btn.disabled=true;
+  setTimeout(()=>{
+    btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In';
+    btn.disabled=false;
+    enterAs(match.role);
+  },800);
+}
+
+// Allow pressing Enter in password field to submit
+document.addEventListener('DOMContentLoaded',()=>{
+  const pwdInput=document.getElementById('login-password');
+  if(pwdInput) pwdInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});
+  const emailInput=document.getElementById('login-email');
+  if(emailInput) emailInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});
+});
+
 function showLanding(){
   document.getElementById('landing').style.display='flex';
   document.querySelectorAll('.app-shell').forEach(e=>e.classList.remove('active'));
   document.getElementById('grading-shell').classList.remove('active');
   ST.currentRole=null;
   if(cdInterval){clearInterval(cdInterval);cdInterval=null;}
+  // Reset login form state
+  document.getElementById('login-error').classList.remove('show');
 }
 function enterAs(role){
   ST.currentRole=role;
@@ -796,6 +972,8 @@ function enterAs(role){
   else if(role==='lecturer'){document.getElementById('lecturer-shell').classList.add('active');renderLecturerTable();}
   else{document.getElementById('student-shell').classList.add('active');renderStudentPortal();startCountdown();}
 }
+
+
 
 /* UTILS */
 function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
