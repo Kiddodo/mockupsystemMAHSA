@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, AlertCircle, MessageSquare, Award } from 'lucide-react';
 
@@ -115,26 +115,26 @@ export const SplitScreenGrading = ({ student, onBack }) => {
   return (
     <div className="h-screen flex flex-col bg-slate-100 overflow-hidden">
       {/* Top Engine Bar */}
-      <div className="bg-[#002a74] text-white px-6 py-3 flex items-center justify-between flex-shrink-0 shadow-md">
-        <div className="flex items-center space-x-4">
+      <div className="bg-[#002d7a] text-white px-5 py-2.5 flex items-center justify-between flex-shrink-0 border-b border-[#001f54]">
+        <div className="flex items-center space-x-3">
           <button
             onClick={onBack}
-            className="p-1.5 hover:bg-white/10 rounded-lg text-blue-200 hover:text-white transition flex items-center gap-1.5 text-xs font-bold"
+            className="p-1 hover:bg-white/10 rounded text-blue-200 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={15} />
             <span>Back to Roster</span>
           </button>
           <div className="h-4 w-px bg-blue-400/30" />
-          <div className="font-extrabold text-sm">
-            Split-Screen Evaluation Workspace: <span className="text-blue-200">{student.name} ({student.id})</span>
+          <div className="font-semibold text-xs sm:text-sm">
+            Evaluation Workspace: <span className="text-blue-100">{student.name} ({student.id})</span>
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
-          <span className="text-xs bg-blue-900/80 px-3 py-1 rounded-full border border-blue-400/30 text-blue-200">
-            Company: {student.company}
+          <span className="text-xs text-blue-200 hidden sm:inline">
+            Host: {student.company}
           </span>
-          <div className="bg-emerald-500 text-white font-black text-sm px-3.5 py-1 rounded-lg shadow-sm">
+          <div className="bg-emerald-600 text-white font-bold text-xs px-3 py-1 rounded">
             Total: {finalPercentage}%
           </div>
         </div>
@@ -145,73 +145,73 @@ export const SplitScreenGrading = ({ student, onBack }) => {
         {/* Left: Document PDF Viewer */}
         <div className="w-1/2 border-r border-slate-300 bg-slate-200 flex flex-col overflow-hidden">
           {/* Document Tabs */}
-          <div className="bg-white p-2.5 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
-            <div className="flex space-x-2">
+          <div className="bg-white p-2 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
+            <div className="flex space-x-1.5">
               <button
                 onClick={() => setDocTab('logbook')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-                  docTab === 'logbook' ? 'bg-[#003DA5] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                className={`px-3 py-1 text-xs font-semibold rounded transition ${
+                  docTab === 'logbook' ? 'bg-[#003DA5] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📔 Logbook (Week 1–12)
+                Logbook Entries
               </button>
               <button
                 onClick={() => setDocTab('report')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-                  docTab === 'report' ? 'bg-[#003DA5] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                className={`px-3 py-1 text-xs font-semibold rounded transition ${
+                  docTab === 'report' ? 'bg-[#003DA5] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📄 Final Internship Report
+                Internship Report
               </button>
               <button
                 onClick={() => setDocTab('duty')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-                  docTab === 'duty' ? 'bg-[#003DA5] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                className={`px-3 py-1 text-xs font-semibold rounded transition ${
+                  docTab === 'duty' ? 'bg-[#003DA5] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📋 Report Duty Form
+                Report Duty Form
               </button>
             </div>
 
             <div className="flex items-center space-x-1 text-xs">
-              <button onClick={() => setZoom(Math.max(80, zoom - 10))} className="p-1 hover:bg-slate-100 rounded text-slate-600"><ZoomOut size={16} /></button>
-              <span className="font-mono text-slate-500">{zoom}%</span>
-              <button onClick={() => setZoom(Math.min(150, zoom + 10))} className="p-1 hover:bg-slate-100 rounded text-slate-600"><ZoomIn size={16} /></button>
+              <button onClick={() => setZoom(Math.max(80, zoom - 10))} className="p-1 hover:bg-slate-100 rounded text-slate-600"><ZoomOut size={15} /></button>
+              <span className="font-mono text-slate-500 text-xs">{zoom}%</span>
+              <button onClick={() => setZoom(Math.min(150, zoom + 10))} className="p-1 hover:bg-slate-100 rounded text-slate-600"><ZoomIn size={15} /></button>
             </div>
           </div>
 
           {/* Document Content View */}
-          <div className="flex-1 p-6 overflow-y-auto flex justify-center">
+          <div className="flex-1 p-5 overflow-y-auto flex justify-center">
             <div 
               style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-              className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full text-xs leading-relaxed text-slate-700 transition-transform duration-100 space-y-4"
+              className="bg-white rounded border border-slate-300 shadow-sm p-6 max-w-lg w-full text-xs leading-relaxed text-slate-700 transition-transform duration-100 space-y-3"
             >
-              <div className="border-b-2 border-[#003DA5] pb-3 text-center">
-                <div className="font-black text-sm text-[#003DA5]">MAHSA UNIVERSITY INDUSTRIAL TRAINING</div>
-                <div className="text-[10px] uppercase text-slate-400 font-bold">{student.program} · {student.company}</div>
+              <div className="border-b-2 border-[#003DA5] pb-2 text-center">
+                <div className="font-bold text-xs text-[#003DA5]">MAHSA UNIVERSITY INDUSTRIAL TRAINING</div>
+                <div className="text-[10px] uppercase text-slate-500">{student.program} · {student.company}</div>
               </div>
 
               {docTab === 'logbook' && (
-                <div className="space-y-4">
-                  <h4 className="font-bold text-slate-800 text-sm">WEEKLY ACTIVITY LOG SUMMARY</h4>
-                  <div className="p-3 bg-slate-50 border rounded-lg">
-                    <strong className="block text-slate-800 mb-1">Week 1–2: Orientation & Department Rotation</strong>
+                <div className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-xs">WEEKLY ACTIVITY LOG SUMMARY</h4>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded">
+                    <strong className="block text-slate-800 mb-0.5">Week 1–2: Orientation & Department Rotation</strong>
                     <p className="text-[11px] text-slate-600">Assisted with HR talent onboarding, database entry, and ERP document compilation. Received full induction.</p>
                   </div>
-                  <div className="p-3 bg-slate-50 border rounded-lg">
-                    <strong className="block text-slate-800 mb-1">Week 3–8: Talent Sourcing & Performance Appraisals</strong>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded">
+                    <strong className="block text-slate-800 mb-0.5">Week 3–8: Talent Sourcing & Performance Appraisals</strong>
                     <p className="text-[11px] text-slate-600">Screened 40+ candidate applications, coordinated initial interviews, and updated staff training matrices.</p>
                   </div>
-                  <div className="p-3 bg-slate-50 border rounded-lg">
-                    <strong className="block text-slate-800 mb-1">Week 9–12: Special Project & Final Review</strong>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded">
+                    <strong className="block text-slate-800 mb-0.5">Week 9–12: Special Project & Final Review</strong>
                     <p className="text-[11px] text-slate-600">Completed employee satisfaction survey analytics and delivered presentation to senior management.</p>
                   </div>
                 </div>
               )}
 
               {docTab === 'report' && (
-                <div className="space-y-4">
-                  <h4 className="font-bold text-slate-800 text-sm">FINAL REPORT: HR SYSTEMS MODERNIZATION</h4>
+                <div className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-xs">FINAL REPORT: HR SYSTEMS MODERNIZATION</h4>
                   <p className="text-[11px] text-slate-600">
                     <strong>Chapter 1:</strong> Introduction to {student.company} organizational structure and human resources division.
                   </p>
@@ -225,8 +225,8 @@ export const SplitScreenGrading = ({ student, onBack }) => {
               )}
 
               {docTab === 'duty' && (
-                <div className="space-y-4">
-                  <h4 className="font-bold text-slate-800 text-sm">ENDORSED REPORT DUTY CONFIRMATION</h4>
+                <div className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-xs">ENDORSED REPORT DUTY CONFIRMATION</h4>
                   <p className="text-[11px] text-slate-600">
                     This confirms that {student.name} duly reported for training at {student.company} on 1 September 2026 under the mentorship of the HR Department.
                   </p>
@@ -238,58 +238,58 @@ export const SplitScreenGrading = ({ student, onBack }) => {
 
         {/* Right: Digital Marking Form */}
         <div className="w-1/2 bg-white flex flex-col overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
+          <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
             <div>
-              <h3 className="font-extrabold text-sm text-slate-800">Faculty Digital Marking Rubric (100%)</h3>
-              <p className="text-[11px] text-slate-500">Lecturer explanations required for Sections A, B & C.</p>
+              <h3 className="font-bold text-xs text-slate-800">Faculty Marking Rubric (100%)</h3>
+              <p className="text-[11px] text-slate-500">Explanations required for Sections A, B & C.</p>
             </div>
-            <span className="text-xs font-bold text-[#003DA5]">
+            <span className="text-xs font-semibold text-[#003DA5]">
               Section A: 20% · Section B: 60% · Section C: 20%
             </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-y-auto space-y-6 text-xs">
+          <form onSubmit={handleSubmit} className="flex-1 p-5 overflow-y-auto space-y-5 text-xs">
             {/* Section A: Logbook Evaluation (with Tier Range and Exact Mark Assignment) */}
-            <div className={`p-4 rounded-xl border transition ${validationErrors.sectionA ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
+            <div className={`p-3.5 rounded border transition ${validationErrors.sectionA ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50/50'}`}>
               <div className="flex justify-between items-center mb-1">
-                <span className="font-bold text-sm text-slate-800">Section A: Logbook Evaluation</span>
-                <span className="font-black text-sm text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                  Awarded: {logbookScore} / 20 Marks
+                <span className="font-bold text-xs text-slate-800">Section A: Logbook Evaluation</span>
+                <span className="font-bold text-xs text-[#003DA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  Score: {logbookScore} / 20
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 mb-3">
-                Select an assessment tier, then assign the exact mark within the tier's designated range.
+              <p className="text-[11px] text-slate-500 mb-2.5">
+                Select rubric tier, then assign exact mark within range.
               </p>
 
               {/* Tiers List */}
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {LOGBOOK_TIERS.map((tier) => {
                   const isSelected = selectedTierId === tier.id;
                   return (
                     <div
                       key={tier.id}
                       onClick={() => handleTierSelect(tier)}
-                      className={`p-3 rounded-xl border transition cursor-pointer ${
+                      className={`p-2.5 rounded border transition cursor-pointer ${
                         isSelected 
-                          ? 'bg-blue-50/80 border-[#003DA5] shadow-sm ring-1 ring-[#003DA5]/20' 
+                          ? 'bg-blue-50/70 border-[#003DA5]' 
                           : 'bg-white border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <label className="flex items-center gap-2.5 cursor-pointer">
+                        <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="radio"
                             name="logbookTier"
                             checked={isSelected}
                             onChange={() => handleTierSelect(tier)}
-                            className="text-[#003DA5] focus:ring-[#003DA5]"
+                            className="text-[#003DA5]"
                           />
-                          <span className={`text-xs font-bold ${isSelected ? 'text-[#003DA5]' : 'text-slate-800'}`}>
+                          <span className={`text-xs ${isSelected ? 'font-bold text-[#003DA5]' : 'font-medium text-slate-800'}`}>
                             {tier.label}
                           </span>
                         </label>
-                        <span className="text-[11px] font-bold text-[#003DA5] bg-blue-100/70 px-2 py-0.5 rounded-md font-mono">
-                          Range: {tier.min}–{tier.max}
+                        <span className="text-[11px] font-semibold text-[#003DA5] bg-blue-100/70 px-1.5 py-0.5 rounded font-mono">
+                          {tier.min}–{tier.max}
                         </span>
                       </div>
 
@@ -297,10 +297,10 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                       {isSelected && (
                         <div 
                           onClick={(e) => e.stopPropagation()} 
-                          className="mt-3 pt-3 border-t border-blue-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-lg border border-blue-100"
+                          className="mt-2.5 pt-2 border-t border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-2.5 rounded border border-blue-100"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-700">Assign Exact Mark:</span>
+                            <span className="text-xs font-semibold text-slate-700">Exact Mark:</span>
                             <div className="flex items-center gap-1">
                               <input
                                 type="number"
@@ -308,23 +308,23 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                                 max={tier.max}
                                 value={logbookScore}
                                 onChange={(e) => handleScoreChange(Number(e.target.value), tier)}
-                                className="w-16 p-1.5 text-center font-black text-sm bg-blue-50 border border-blue-300 rounded-lg text-[#003DA5] focus:outline-none focus:ring-2 focus:ring-[#003DA5]"
+                                className="w-14 p-1 text-center font-bold text-xs bg-blue-50 border border-blue-300 rounded text-[#003DA5] focus:outline-none"
                               />
-                              <span className="text-xs font-semibold text-slate-500">/ 20</span>
+                              <span className="text-xs text-slate-500">/ 20</span>
                             </div>
                           </div>
 
                           {/* Quick Pick Buttons */}
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[11px] text-slate-400 font-semibold">Quick Pick:</span>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className="text-[11px] text-slate-500">Pick:</span>
                             {Array.from({ length: tier.max - tier.min + 1 }, (_, i) => tier.min + i).map((scoreVal) => (
                               <button
                                 key={scoreVal}
                                 type="button"
                                 onClick={() => setLogbookScore(scoreVal)}
-                                className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                                className={`px-2 py-0.5 text-xs rounded transition font-semibold ${
                                   logbookScore === scoreVal
-                                    ? 'bg-[#003DA5] text-white shadow-sm ring-1 ring-[#003DA5]'
+                                    ? 'bg-[#003DA5] text-white'
                                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                                 }`}
                               >
@@ -340,14 +340,14 @@ export const SplitScreenGrading = ({ student, onBack }) => {
               </div>
 
               {/* Section A Explanation (Required) */}
-              <div className="mt-4 pt-3 border-t border-slate-200">
+              <div className="mt-3 pt-2.5 border-t border-slate-200">
                 <div className="flex justify-between items-center mb-1">
-                  <label className="font-bold text-slate-700 flex items-center gap-1.5">
-                    <MessageSquare size={13} className="text-[#003DA5]" />
-                    <span>Section A Marks Explanation & Justification</span>
-                    <span className="text-red-500 font-bold">*</span>
+                  <label className="font-semibold text-slate-700 flex items-center gap-1.5">
+                    <MessageSquare size={12} className="text-[#003DA5]" />
+                    <span>Section A Justification</span>
+                    <span className="text-red-500">*</span>
                   </label>
-                  <span className="text-[10px] text-red-500 font-bold">Required</span>
+                  <span className="text-[10px] text-red-500 font-semibold">Required</span>
                 </div>
                 <textarea
                   rows={2}
@@ -356,50 +356,50 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                     setSectionAExplanation(e.target.value);
                     if (validationErrors.sectionA) setValidationErrors({...validationErrors, sectionA: null});
                   }}
-                  placeholder="Explain reasoning for logbook marks (e.g. entry consistency, depth of daily reflections, mentor verification)..."
-                  className={`w-full p-2.5 bg-white border rounded-lg text-xs focus:ring-2 focus:ring-[#003DA5] outline-none ${
-                    validationErrors.sectionA ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'
+                  placeholder="Reasoning for logbook score..."
+                  className={`w-full p-2 bg-white border rounded text-xs outline-none focus:border-[#003DA5] ${
+                    validationErrors.sectionA ? 'border-red-400' : 'border-slate-300'
                   }`}
                 />
                 {validationErrors.sectionA && (
-                  <p className="text-[11px] text-red-600 font-semibold mt-1 flex items-center gap-1">
-                    <AlertCircle size={12} /> {validationErrors.sectionA}
+                  <p className="text-[11px] text-red-600 font-medium mt-1 flex items-center gap-1">
+                    <AlertCircle size={11} /> {validationErrors.sectionA}
                   </p>
                 )}
               </div>
             </div>
 
             {/* Section B: Chapters */}
-            <div className={`p-4 rounded-xl border transition ${validationErrors.sectionB ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
-              <div className="flex justify-between items-center mb-3">
-                <span className="font-bold text-sm text-slate-800">Section B: Report Chapters</span>
-                <span className="font-black text-[#003DA5]">{reportTotal} / 60 Marks</span>
+            <div className={`p-3.5 rounded border transition ${validationErrors.sectionB ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50/50'}`}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-xs text-slate-800">Section B: Report Chapters</span>
+                <span className="font-bold text-xs text-[#003DA5]">{reportTotal} / 60 Marks</span>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-2 gap-2 mb-3">
                 {Object.entries(chapters).map(([ch, val]) => (
                   <div key={ch}>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1 uppercase">{ch} (Max 10)</label>
+                    <label className="block text-[10px] font-semibold text-slate-600 mb-0.5 uppercase">{ch} (Max 10)</label>
                     <input
                       type="number"
                       max={15}
                       min={0}
                       value={val}
                       onChange={(e) => setChapters({ ...chapters, [ch]: Number(e.target.value) })}
-                      className="w-full p-2 bg-white border border-slate-200 rounded font-bold text-slate-800 text-xs"
+                      className="w-full p-1.5 bg-white border border-slate-300 rounded font-semibold text-slate-800 text-xs focus:outline-none focus:border-[#003DA5]"
                     />
                   </div>
                 ))}
               </div>
 
               {/* Section B Explanation (Required) */}
-              <div className="pt-3 border-t border-slate-200">
+              <div className="pt-2.5 border-t border-slate-200">
                 <div className="flex justify-between items-center mb-1">
-                  <label className="font-bold text-slate-700 flex items-center gap-1.5">
-                    <MessageSquare size={13} className="text-[#003DA5]" />
-                    <span>Section B Marks Explanation & Justification</span>
-                    <span className="text-red-500 font-bold">*</span>
+                  <label className="font-semibold text-slate-700 flex items-center gap-1.5">
+                    <MessageSquare size={12} className="text-[#003DA5]" />
+                    <span>Section B Justification</span>
+                    <span className="text-red-500">*</span>
                   </label>
-                  <span className="text-[10px] text-red-500 font-bold">Required</span>
+                  <span className="text-[10px] text-red-500 font-semibold">Required</span>
                 </div>
                 <textarea
                   rows={2}
@@ -408,31 +408,31 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                     setSectionBExplanation(e.target.value);
                     if (validationErrors.sectionB) setValidationErrors({...validationErrors, sectionB: null});
                   }}
-                  placeholder="Explain reasoning for report chapters scoring (e.g. analysis quality, methodology rigor, findings clarity)..."
-                  className={`w-full p-2.5 bg-white border rounded-lg text-xs focus:ring-2 focus:ring-[#003DA5] outline-none ${
-                    validationErrors.sectionB ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'
+                  placeholder="Reasoning for report chapters scoring..."
+                  className={`w-full p-2 bg-white border rounded text-xs outline-none focus:border-[#003DA5] ${
+                    validationErrors.sectionB ? 'border-red-400' : 'border-slate-300'
                   }`}
                 />
                 {validationErrors.sectionB && (
-                  <p className="text-[11px] text-red-600 font-semibold mt-1 flex items-center gap-1">
-                    <AlertCircle size={12} /> {validationErrors.sectionB}
+                  <p className="text-[11px] text-red-600 font-medium mt-1 flex items-center gap-1">
+                    <AlertCircle size={11} /> {validationErrors.sectionB}
                   </p>
                 )}
               </div>
             </div>
 
             {/* Section C: Conduct */}
-            <div className={`p-4 rounded-xl border transition ${validationErrors.sectionC ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
-              <div className="flex justify-between items-center mb-3">
-                <span className="font-bold text-sm text-slate-800">Section C: Professional Conduct</span>
-                <span className="font-black text-[#003DA5]">{conductScore} / 20 Marks</span>
+            <div className={`p-3.5 rounded border transition ${validationErrors.sectionC ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50/50'}`}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-xs text-slate-800">Section C: Professional Conduct</span>
+                <span className="font-bold text-xs text-[#003DA5]">{conductScore} / 20 Marks</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {[
                   { score: 19, label: 'Exceptional: Proactive initiative & exemplary ethics (18-20)' },
                   { score: 15, label: 'Good: Reliable, respectful and cooperative (13-17)' }
                 ].map((opt) => (
-                  <label key={opt.score} className="flex items-center gap-2 p-2 bg-white rounded border border-slate-200 cursor-pointer hover:border-blue-400">
+                  <label key={opt.score} className="flex items-center gap-2 p-2 bg-white rounded border border-slate-200 cursor-pointer hover:border-slate-300 text-xs">
                     <input
                       type="radio"
                       name="conduct"
@@ -445,14 +445,14 @@ export const SplitScreenGrading = ({ student, onBack }) => {
               </div>
 
               {/* Section C Explanation (Required) */}
-              <div className="mt-4 pt-3 border-t border-slate-200">
+              <div className="mt-3 pt-2.5 border-t border-slate-200">
                 <div className="flex justify-between items-center mb-1">
-                  <label className="font-bold text-slate-700 flex items-center gap-1.5">
-                    <MessageSquare size={13} className="text-[#003DA5]" />
-                    <span>Section C Marks Explanation & Justification</span>
-                    <span className="text-red-500 font-bold">*</span>
+                  <label className="font-semibold text-slate-700 flex items-center gap-1.5">
+                    <MessageSquare size={12} className="text-[#003DA5]" />
+                    <span>Section C Justification</span>
+                    <span className="text-red-500">*</span>
                   </label>
-                  <span className="text-[10px] text-red-500 font-bold">Required</span>
+                  <span className="text-[10px] text-red-500 font-semibold">Required</span>
                 </div>
                 <textarea
                   rows={2}
@@ -461,32 +461,31 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                     setSectionCExplanation(e.target.value);
                     if (validationErrors.sectionC) setValidationErrors({...validationErrors, sectionC: null});
                   }}
-                  placeholder="Explain reasoning for professional conduct scoring (e.g. host mentor feedback, punctuality, ethics)..."
-                  className={`w-full p-2.5 bg-white border rounded-lg text-xs focus:ring-2 focus:ring-[#003DA5] outline-none ${
-                    validationErrors.sectionC ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'
+                  placeholder="Reasoning for conduct score..."
+                  className={`w-full p-2 bg-white border rounded text-xs outline-none focus:border-[#003DA5] ${
+                    validationErrors.sectionC ? 'border-red-400' : 'border-slate-300'
                   }`}
                 />
                 {validationErrors.sectionC && (
-                  <p className="text-[11px] text-red-600 font-semibold mt-1 flex items-center gap-1">
-                    <AlertCircle size={12} /> {validationErrors.sectionC}
+                  <p className="text-[11px] text-red-600 font-medium mt-1 flex items-center gap-1">
+                    <AlertCircle size={11} /> {validationErrors.sectionC}
                   </p>
                 )}
               </div>
             </div>
 
             {/* Optional Supervisor Feedback & Recommendation */}
-            <div className="p-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 space-y-3">
+            <div className="p-3.5 rounded border border-slate-300 bg-slate-50/50 space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-700 text-xs">Supervisor Recommendation & Additional Feedback</span>
-                <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">Optional</span>
+                <span className="font-semibold text-slate-700 text-xs">Supervisor Recommendation (Optional)</span>
+                <span className="text-slate-500 text-[10px]">Optional</span>
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Overall Recommendation (Optional)</label>
                 <select
                   value={recommendation}
                   onChange={(e) => setRecommendation(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 outline-none"
+                  className="w-full p-1.5 bg-white border border-slate-300 rounded text-xs text-slate-700 outline-none focus:border-[#003DA5]"
                 >
                   <option value="">— Select recommendation (Optional) —</option>
                   <option value="Highly Recommended for Employment">Highly Recommended for Employment</option>
@@ -497,34 +496,34 @@ export const SplitScreenGrading = ({ student, onBack }) => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Supervisor Commendation & Feedback Remarks (Optional)</label>
+                <label className="block text-[11px] text-slate-600 mb-1">Supervisor Commendation (Optional)</label>
                 <textarea
                   rows={2}
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Enter any additional optional remarks or commendations for the student..."
-                  className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                  placeholder="Optional remarks or commendations..."
+                  className="w-full p-2 bg-white border border-slate-300 rounded text-xs outline-none focus:border-[#003DA5]"
                 />
               </div>
             </div>
 
             {/* Digital Signature Confirmation */}
-            <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50 flex items-center justify-between">
+            <div className="p-3 rounded border border-emerald-200 bg-emerald-50/60 flex items-center justify-between">
               <div>
-                <div className="font-bold text-slate-800">Digital Evaluator Signature</div>
-                <div className="text-[11px] text-slate-500 font-mono">Dr. Rahman (Lecturer) · Digitally Endorsed</div>
+                <div className="font-semibold text-slate-800 text-xs">Digital Evaluator Endorsement</div>
+                <div className="text-[11px] text-slate-500">Dr. Rahman (Lecturer)</div>
               </div>
-              <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold text-xs">
-                ✓ Signed
+              <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold text-xs border border-emerald-200">
+                Endorsed
               </span>
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold text-xs rounded transition flex items-center justify-center gap-1.5"
             >
-              <Check size={18} />
-              <span>Submit Final Marks ({finalPercentage}%)</span>
+              <Check size={15} />
+              <span>Submit Evaluation ({finalPercentage}%)</span>
             </button>
           </form>
         </div>

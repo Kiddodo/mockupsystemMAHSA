@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 :root {
   --mahsa-blue: #003DA5;
@@ -8,9 +8,9 @@
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
-  background-color: #f8fafc;
-  color: #1e293b;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f6f9;
+  color: #212529;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
