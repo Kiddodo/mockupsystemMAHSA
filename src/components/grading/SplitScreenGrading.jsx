@@ -1,6 +1,22 @@
 ﻿import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, AlertCircle, MessageSquare } from 'lucide-react';
+import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, AlertCircle, MessageSquare, Award } from 'lucide-react';
+
+const LOGBOOK_TIERS = [
+  { id: 'excellent', label: 'Excellent: Comprehensive reflections, verified weekly', min: 18, max: 20, defaultScore: 19 },
+  { id: 'good', label: 'Good: Consistent entries with sound observations', min: 13, max: 17, defaultScore: 15 },
+  { id: 'satisfactory', label: 'Satisfactory: Adequate reporting, minor omissions', min: 9, max: 12, defaultScore: 11 },
+  { id: 'below_average', label: 'Below Average: Incomplete entries, minimal reflection', min: 5, max: 8, defaultScore: 7 },
+  { id: 'poor', label: 'Poor: Critical omissions, lacked supervisor verification', min: 0, max: 4, defaultScore: 2 },
+];
+
+const getTierForScore = (score) => {
+  if (score >= 18) return 'excellent';
+  if (score >= 13) return 'good';
+  if (score >= 9) return 'satisfactory';
+  if (score >= 5) return 'below_average';
+  return 'poor';
+};
 
 export const SplitScreenGrading = ({ student, onBack }) => {
   const { submitStudentMarks, showToast } = useApp();
@@ -8,7 +24,10 @@ export const SplitScreenGrading = ({ student, onBack }) => {
   const [zoom, setZoom] = useState(100);
 
   // Rubric Scores
-  const [logbookScore, setLogbookScore] = useState(student?.rubricScores?.logbook ?? 18);
+  const initialLogbookScore = student?.rubricScores?.logbook ?? 18;
+  const [logbookScore, setLogbookScore] = useState(initialLogbookScore);
+  const [selectedTierId, setSelectedTierId] = useState(getTierForScore(initialLogbookScore));
+
   const [chapters, setChapters] = useState(student?.rubricScores?.chapters || {
     ch1: 9,
     ch2: 9,
@@ -39,6 +58,22 @@ export const SplitScreenGrading = ({ student, onBack }) => {
 
   const reportTotal = Object.values(chapters).reduce((a, b) => Number(a) + Number(b), 0);
   const finalPercentage = logbookScore + reportTotal + conductScore;
+
+  // Handle tier selection
+  const handleTierSelect = (tier) => {
+    setSelectedTierId(tier.id);
+    // If current score is outside this tier, clamp to default or range
+    if (logbookScore < tier.min || logbookScore > tier.max) {
+      setLogbookScore(tier.defaultScore);
+    }
+  };
+
+  // Handle exact score change with clamping to tier range
+  const handleScoreChange = (newVal, tier) => {
+    if (isNaN(newVal)) return;
+    const clamped = Math.min(Math.max(newVal, tier.min), tier.max);
+    setLogbookScore(clamped);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -214,28 +249,94 @@ export const SplitScreenGrading = ({ student, onBack }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-y-auto space-y-6 text-xs">
-            {/* Section A: Logbook */}
+            {/* Section A: Logbook Evaluation (with Tier Range and Exact Mark Assignment) */}
             <div className={`p-4 rounded-xl border transition ${validationErrors.sectionA ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
-              <div className="flex justify-between items-center mb-3">
+              <div className="flex justify-between items-center mb-1">
                 <span className="font-bold text-sm text-slate-800">Section A: Logbook Evaluation</span>
-                <span className="font-black text-[#003DA5]">{logbookScore} / 20 Marks</span>
+                <span className="font-black text-sm text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                  Awarded: {logbookScore} / 20 Marks
+                </span>
               </div>
-              <div className="space-y-2">
-                {[
-                  { score: 18, label: 'Excellent: Comprehensive reflections, verified weekly (18-20)' },
-                  { score: 14, label: 'Good: Consistent entries with sound observations (13-17)' },
-                  { score: 10, label: 'Satisfactory: Adequate reporting, minor omissions (9-12)' }
-                ].map((opt) => (
-                  <label key={opt.score} className="flex items-center gap-2 p-2 bg-white rounded border border-slate-200 cursor-pointer hover:border-blue-400">
-                    <input
-                      type="radio"
-                      name="logbook"
-                      checked={logbookScore === opt.score}
-                      onChange={() => setLogbookScore(opt.score)}
-                    />
-                    <span>{opt.label}</span>
-                  </label>
-                ))}
+              <p className="text-[11px] text-slate-500 mb-3">
+                Select an assessment tier, then assign the exact mark within the tier's designated range.
+              </p>
+
+              {/* Tiers List */}
+              <div className="space-y-2.5">
+                {LOGBOOK_TIERS.map((tier) => {
+                  const isSelected = selectedTierId === tier.id;
+                  return (
+                    <div
+                      key={tier.id}
+                      onClick={() => handleTierSelect(tier)}
+                      className={`p-3 rounded-xl border transition cursor-pointer ${
+                        isSelected 
+                          ? 'bg-blue-50/80 border-[#003DA5] shadow-sm ring-1 ring-[#003DA5]/20' 
+                          : 'bg-white border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <label className="flex items-center gap-2.5 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="logbookTier"
+                            checked={isSelected}
+                            onChange={() => handleTierSelect(tier)}
+                            className="text-[#003DA5] focus:ring-[#003DA5]"
+                          />
+                          <span className={`text-xs font-bold ${isSelected ? 'text-[#003DA5]' : 'text-slate-800'}`}>
+                            {tier.label}
+                          </span>
+                        </label>
+                        <span className="text-[11px] font-bold text-[#003DA5] bg-blue-100/70 px-2 py-0.5 rounded-md font-mono">
+                          Range: {tier.min}–{tier.max}
+                        </span>
+                      </div>
+
+                      {/* Expanded Exact Mark Range Controller */}
+                      {isSelected && (
+                        <div 
+                          onClick={(e) => e.stopPropagation()} 
+                          className="mt-3 pt-3 border-t border-blue-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-lg border border-blue-100"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-700">Assign Exact Mark:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min={tier.min}
+                                max={tier.max}
+                                value={logbookScore}
+                                onChange={(e) => handleScoreChange(Number(e.target.value), tier)}
+                                className="w-16 p-1.5 text-center font-black text-sm bg-blue-50 border border-blue-300 rounded-lg text-[#003DA5] focus:outline-none focus:ring-2 focus:ring-[#003DA5]"
+                              />
+                              <span className="text-xs font-semibold text-slate-500">/ 20</span>
+                            </div>
+                          </div>
+
+                          {/* Quick Pick Buttons */}
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[11px] text-slate-400 font-semibold">Quick Pick:</span>
+                            {Array.from({ length: tier.max - tier.min + 1 }, (_, i) => tier.min + i).map((scoreVal) => (
+                              <button
+                                key={scoreVal}
+                                type="button"
+                                onClick={() => setLogbookScore(scoreVal)}
+                                className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                                  logbookScore === scoreVal
+                                    ? 'bg-[#003DA5] text-white shadow-sm ring-1 ring-[#003DA5]'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                }`}
+                              >
+                                {scoreVal}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Section A Explanation (Required) */}
