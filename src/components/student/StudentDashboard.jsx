@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   CheckCircle2, Clock, Lock, FileText, Download, Upload, 
@@ -362,11 +362,46 @@ export const StudentDashboard = () => {
       {activeTab === 4 && (
         <div className="space-y-6">
           {currentStudent?.marks && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-black text-slate-800">Final Grade Recorded: {currentStudent.marks}%</h3>
-                <p className="text-xs text-slate-600 mt-1">Evaluated by {currentStudent.lecturer}.</p>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
+                <div>
+                  <h3 className="text-xl font-black text-slate-800">Final Grade Recorded: {currentStudent.marks}%</h3>
+                  <p className="text-xs text-slate-600 mt-0.5">Evaluated by: <strong>{currentStudent.lecturer}</strong></p>
+                </div>
+                {currentStudent.recommendation && (
+                  <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-300 self-start sm:self-auto">
+                    {currentStudent.recommendation}
+                  </span>
+                )}
               </div>
+
+              {/* Section Explanations Grid */}
+              <div className="grid md:grid-cols-3 gap-3 text-xs">
+                <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
+                  <div className="font-bold text-slate-800 mb-1">Section A (Logbook) Remarks:</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    {currentStudent?.rubricScores?.sectionAExplanation || 'Verified consistent reflection logs.'}
+                  </p>
+                </div>
+                <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
+                  <div className="font-bold text-slate-800 mb-1">Section B (Report) Remarks:</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    {currentStudent?.rubricScores?.sectionBExplanation || 'Analytical depth and chapters evaluated.'}
+                  </p>
+                </div>
+                <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
+                  <div className="font-bold text-slate-800 mb-1">Section C (Conduct) Remarks:</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    {currentStudent?.rubricScores?.sectionCExplanation || 'Professional conduct endorsed by host mentor.'}
+                  </p>
+                </div>
+              </div>
+
+              {currentStudent.feedback && (
+                <div className="bg-white/60 p-3 rounded-xl border border-emerald-200 text-xs text-slate-700">
+                  <strong className="font-bold text-slate-800">Supervisor Commendation:</strong> {currentStudent.feedback}
+                </div>
+              )}
             </div>
           )}
 

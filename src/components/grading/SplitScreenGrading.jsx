@@ -1,14 +1,14 @@
-﻿import React, { useState, useRef } from 'react';
+﻿import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, BookOpen, UserCheck, Shield } from 'lucide-react';
+import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, AlertCircle, MessageSquare } from 'lucide-react';
 
 export const SplitScreenGrading = ({ student, onBack }) => {
-  const { submitStudentMarks } = useApp();
+  const { submitStudentMarks, showToast } = useApp();
   const [docTab, setDocTab] = useState('logbook');
   const [zoom, setZoom] = useState(100);
 
   // Rubric Scores
-  const [logbookScore, setLogbookScore] = useState(student?.rubricScores?.logbook || 18);
+  const [logbookScore, setLogbookScore] = useState(student?.rubricScores?.logbook ?? 18);
   const [chapters, setChapters] = useState(student?.rubricScores?.chapters || {
     ch1: 9,
     ch2: 9,
@@ -17,23 +17,62 @@ export const SplitScreenGrading = ({ student, onBack }) => {
     ch5: 9,
     ch6: 5
   });
-  const [conductScore, setConductScore] = useState(student?.rubricScores?.conduct || 19);
-  const [feedback, setFeedback] = useState(student?.feedback || 'Demonstrated outstanding dedication and professional communication throughout the 12-week placement.');
-  const [recommendation, setRecommendation] = useState(student?.recommendation || 'Highly Recommended for Employment');
-  const [signed, setSigned] = useState(true);
+  const [conductScore, setConductScore] = useState(student?.rubricScores?.conduct ?? 19);
 
-  const canvasRef = useRef(null);
+  // Required Section Explanations
+  const [sectionAExplanation, setSectionAExplanation] = useState(
+    student?.rubricScores?.sectionAExplanation || 'Entries submitted consistently with detailed weekly reflections and supervisor sign-offs.'
+  );
+  const [sectionBExplanation, setSectionBExplanation] = useState(
+    student?.rubricScores?.sectionBExplanation || 'Thorough literature review and sound methodology. Findings in Chapter 4 demonstrate clear analytical depth.'
+  );
+  const [sectionCExplanation, setSectionCExplanation] = useState(
+    student?.rubricScores?.sectionCExplanation || 'Exemplary punctuality, professional ethics, and proactive teamwork during host placement.'
+  );
+
+  // Optional Supervisor Feedback & Recommendation
+  const [feedback, setFeedback] = useState(student?.feedback || '');
+  const [recommendation, setRecommendation] = useState(student?.recommendation || '');
+
+  // Validation Error State
+  const [validationErrors, setValidationErrors] = useState({});
 
   const reportTotal = Object.values(chapters).reduce((a, b) => Number(a) + Number(b), 0);
   const finalPercentage = logbookScore + reportTotal + conductScore;
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const errors = {};
+
+    if (!sectionAExplanation.trim()) {
+      errors.sectionA = 'Please provide an explanation for Section A (Logbook) marks.';
+    }
+    if (!sectionBExplanation.trim()) {
+      errors.sectionB = 'Please provide an explanation for Section B (Report Chapters) marks.';
+    }
+    if (!sectionCExplanation.trim()) {
+      errors.sectionC = 'Please provide an explanation for Section C (Conduct) marks.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      showToast('Please fill in explanations for all 3 rubric sections before submitting.', 'warning');
+      return;
+    }
+
+    setValidationErrors({});
     submitStudentMarks(student.id, {
       total: finalPercentage,
-      rubricScores: { logbook: logbookScore, chapters, conduct: conductScore },
-      feedback,
-      recommendation
+      rubricScores: { 
+        logbook: logbookScore, 
+        chapters, 
+        conduct: conductScore,
+        sectionAExplanation,
+        sectionBExplanation,
+        sectionCExplanation
+      },
+      feedback: feedback.trim() || 'Satisfactory completion of placement.',
+      recommendation: recommendation || 'Recommended for Employment'
     });
     onBack();
   };
@@ -165,7 +204,10 @@ export const SplitScreenGrading = ({ student, onBack }) => {
         {/* Right: Digital Marking Form */}
         <div className="w-1/2 bg-white flex flex-col overflow-hidden">
           <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
-            <h3 className="font-extrabold text-sm text-slate-800">Faculty Digital Marking Rubric (100%)</h3>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-800">Faculty Digital Marking Rubric (100%)</h3>
+              <p className="text-[11px] text-slate-500">Lecturer explanations required for Sections A, B & C.</p>
+            </div>
             <span className="text-xs font-bold text-[#003DA5]">
               Section A: 20% · Section B: 60% · Section C: 20%
             </span>
@@ -173,7 +215,7 @@ export const SplitScreenGrading = ({ student, onBack }) => {
 
           <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-y-auto space-y-6 text-xs">
             {/* Section A: Logbook */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+            <div className={`p-4 rounded-xl border transition ${validationErrors.sectionA ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
               <div className="flex justify-between items-center mb-3">
                 <span className="font-bold text-sm text-slate-800">Section A: Logbook Evaluation</span>
                 <span className="font-black text-[#003DA5]">{logbookScore} / 20 Marks</span>
@@ -195,15 +237,44 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                   </label>
                 ))}
               </div>
+
+              {/* Section A Explanation (Required) */}
+              <div className="mt-4 pt-3 border-t border-slate-200">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="font-bold text-slate-700 flex items-center gap-1.5">
+                    <MessageSquare size={13} className="text-[#003DA5]" />
+                    <span>Section A Marks Explanation & Justification</span>
+                    <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <span className="text-[10px] text-red-500 font-bold">Required</span>
+                </div>
+                <textarea
+                  rows={2}
+                  value={sectionAExplanation}
+                  onChange={(e) => {
+                    setSectionAExplanation(e.target.value);
+                    if (validationErrors.sectionA) setValidationErrors({...validationErrors, sectionA: null});
+                  }}
+                  placeholder="Explain reasoning for logbook marks (e.g. entry consistency, depth of daily reflections, mentor verification)..."
+                  className={`w-full p-2.5 bg-white border rounded-lg text-xs focus:ring-2 focus:ring-[#003DA5] outline-none ${
+                    validationErrors.sectionA ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'
+                  }`}
+                />
+                {validationErrors.sectionA && (
+                  <p className="text-[11px] text-red-600 font-semibold mt-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> {validationErrors.sectionA}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Section B: Chapters */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+            <div className={`p-4 rounded-xl border transition ${validationErrors.sectionB ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
               <div className="flex justify-between items-center mb-3">
                 <span className="font-bold text-sm text-slate-800">Section B: Report Chapters</span>
                 <span className="font-black text-[#003DA5]">{reportTotal} / 60 Marks</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 {Object.entries(chapters).map(([ch, val]) => (
                   <div key={ch}>
                     <label className="block text-[11px] font-bold text-slate-600 mb-1 uppercase">{ch} (Max 10)</label>
@@ -218,10 +289,39 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                   </div>
                 ))}
               </div>
+
+              {/* Section B Explanation (Required) */}
+              <div className="pt-3 border-t border-slate-200">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="font-bold text-slate-700 flex items-center gap-1.5">
+                    <MessageSquare size={13} className="text-[#003DA5]" />
+                    <span>Section B Marks Explanation & Justification</span>
+                    <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <span className="text-[10px] text-red-500 font-bold">Required</span>
+                </div>
+                <textarea
+                  rows={2}
+                  value={sectionBExplanation}
+                  onChange={(e) => {
+                    setSectionBExplanation(e.target.value);
+                    if (validationErrors.sectionB) setValidationErrors({...validationErrors, sectionB: null});
+                  }}
+                  placeholder="Explain reasoning for report chapters scoring (e.g. analysis quality, methodology rigor, findings clarity)..."
+                  className={`w-full p-2.5 bg-white border rounded-lg text-xs focus:ring-2 focus:ring-[#003DA5] outline-none ${
+                    validationErrors.sectionB ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'
+                  }`}
+                />
+                {validationErrors.sectionB && (
+                  <p className="text-[11px] text-red-600 font-semibold mt-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> {validationErrors.sectionB}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Section C: Conduct */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+            <div className={`p-4 rounded-xl border transition ${validationErrors.sectionC ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50'}`}>
               <div className="flex justify-between items-center mb-3">
                 <span className="font-bold text-sm text-slate-800">Section C: Professional Conduct</span>
                 <span className="font-black text-[#003DA5]">{conductScore} / 20 Marks</span>
@@ -242,24 +342,76 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                   </label>
                 ))}
               </div>
+
+              {/* Section C Explanation (Required) */}
+              <div className="mt-4 pt-3 border-t border-slate-200">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="font-bold text-slate-700 flex items-center gap-1.5">
+                    <MessageSquare size={13} className="text-[#003DA5]" />
+                    <span>Section C Marks Explanation & Justification</span>
+                    <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <span className="text-[10px] text-red-500 font-bold">Required</span>
+                </div>
+                <textarea
+                  rows={2}
+                  value={sectionCExplanation}
+                  onChange={(e) => {
+                    setSectionCExplanation(e.target.value);
+                    if (validationErrors.sectionC) setValidationErrors({...validationErrors, sectionC: null});
+                  }}
+                  placeholder="Explain reasoning for professional conduct scoring (e.g. host mentor feedback, punctuality, ethics)..."
+                  className={`w-full p-2.5 bg-white border rounded-lg text-xs focus:ring-2 focus:ring-[#003DA5] outline-none ${
+                    validationErrors.sectionC ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'
+                  }`}
+                />
+                {validationErrors.sectionC && (
+                  <p className="text-[11px] text-red-600 font-semibold mt-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> {validationErrors.sectionC}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Evaluator Remarks */}
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Supervisor Commendation & Feedback</label>
-              <textarea
-                rows={3}
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-lg text-xs"
-              />
+            {/* Optional Supervisor Feedback & Recommendation */}
+            <div className="p-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-700 text-xs">Supervisor Recommendation & Additional Feedback</span>
+                <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">Optional</span>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Overall Recommendation (Optional)</label>
+                <select
+                  value={recommendation}
+                  onChange={(e) => setRecommendation(e.target.value)}
+                  className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 outline-none"
+                >
+                  <option value="">— Select recommendation (Optional) —</option>
+                  <option value="Highly Recommended for Employment">Highly Recommended for Employment</option>
+                  <option value="Recommended for Employment">Recommended for Employment</option>
+                  <option value="Recommended with Reservations">Recommended with Reservations</option>
+                  <option value="Not Recommended">Not Recommended</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">Supervisor Commendation & Feedback Remarks (Optional)</label>
+                <textarea
+                  rows={2}
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Enter any additional optional remarks or commendations for the student..."
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                />
+              </div>
             </div>
 
             {/* Digital Signature Confirmation */}
             <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50 flex items-center justify-between">
               <div>
                 <div className="font-bold text-slate-800">Digital Evaluator Signature</div>
-                <div className="text-[11px] text-slate-500 font-mono">Dr. Rahman (Lecturer) · Digitally Validated</div>
+                <div className="text-[11px] text-slate-500 font-mono">Dr. Rahman (Lecturer) · Digitally Endorsed</div>
               </div>
               <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold text-xs">
                 ✓ Signed
