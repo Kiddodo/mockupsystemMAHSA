@@ -111,7 +111,13 @@ export const StudentDashboard = () => {
             <div className={`text-[10px] font-bold uppercase tracking-wider ${activeTab === 3 ? 'text-blue-200' : 'text-slate-400'}`}>Phase 3</div>
             <div className="font-extrabold text-sm mt-0.5">Offer & Report Duty</div>
           </div>
-          {currentStudent?.documents?.offerLetter ? <CheckCircle2 size={18} className="text-emerald-400" /> : <Clock size={16} />}
+          {!isPhase2Unlocked ? (
+            <Lock size={16} className="text-amber-500" />
+          ) : currentStudent?.documents?.offerLetter ? (
+            <CheckCircle2 size={18} className="text-emerald-400" />
+          ) : (
+            <Clock size={16} />
+          )}
         </button>
 
         <button
@@ -124,7 +130,13 @@ export const StudentDashboard = () => {
             <div className={`text-[10px] font-bold uppercase tracking-wider ${activeTab === 4 ? 'text-blue-200' : 'text-slate-400'}`}>Phase 4</div>
             <div className="font-extrabold text-sm mt-0.5">Submissions & Grading</div>
           </div>
-          {currentStudent?.marks ? <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-2 py-0.5 rounded-full">{currentStudent.marks}%</span> : <Clock size={16} />}
+          {!isPhase2Unlocked ? (
+            <Lock size={16} className="text-amber-500" />
+          ) : currentStudent?.marks ? (
+            <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-2 py-0.5 rounded-full">{currentStudent.marks}%</span>
+          ) : (
+            <Clock size={16} />
+          )}
         </button>
       </div>
 
@@ -283,204 +295,226 @@ export const StudentDashboard = () => {
 
       {/* Phase 3: Offer & Report Duty (with Individual Deadlines) */}
       {activeTab === 3 && (
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Step 1: Offer Letter */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 1</span>
-                <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}</strong>
-                </span>
-              </div>
-              
-              <h4 className="font-extrabold text-base text-slate-800 mt-2">Company Offer Letter</h4>
-              <p className="text-xs text-slate-500 mt-1">Official acceptance letter with internship allowance and tenure.</p>
-              
-              {currentStudent?.documents?.offerLetter && (
-                <div className="mt-4 p-3 bg-slate-50 border rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2">
-                  <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.offerLetter}
-                </div>
-              )}
-
-              {lockOffer && (
-                <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
-                  <Lock size={14} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}). Upload locked by coordinator.
-                </div>
-              )}
+        <div>
+          {!isPhase2Unlocked ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center max-w-xl mx-auto my-8">
+              <Lock size={32} className="text-amber-500 mx-auto mb-3" />
+              <h3 className="font-extrabold text-lg text-slate-800 mb-2">Phase 3 Currently Gated</h3>
+              <p className="text-xs text-slate-600 mb-4">You must obtain Finance (Bursary) and Faculty approvals in Phase 1 and receive your official SAL before submitting company offer letters or reporting duty.</p>
+              <div className="text-xs font-bold text-slate-500">Tip: Click "⚡ Quick Unlock Phase 2" in the top bar to test live unlock.</div>
             </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Step 1: Offer Letter */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 1</span>
+                    <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                      <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}</strong>
+                    </span>
+                  </div>
+                  
+                  <h4 className="font-extrabold text-base text-slate-800 mt-2">Company Offer Letter</h4>
+                  <p className="text-xs text-slate-500 mt-1">Official acceptance letter with internship allowance and tenure.</p>
+                  
+                  {currentStudent?.documents?.offerLetter && (
+                    <div className="mt-4 p-3 bg-slate-50 border rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2">
+                      <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.offerLetter}
+                    </div>
+                  )}
 
-            <button
-              disabled={lockOffer}
-              onClick={() => updateStudentDocument(currentStudent.id, 'offerLetter', 'OfferLetter_GrandHyatt.pdf', 3)}
-              className="mt-6 w-full py-2.5 bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
-            >
-              <Upload size={14} /> 
-              <span>{lockOffer ? 'Uploads Closed' : currentStudent?.documents?.offerLetter ? 'Replace Offer Letter' : 'Upload Offer Letter'}</span>
-            </button>
-          </div>
+                  {lockOffer && (
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
+                      <Lock size={14} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}). Upload locked by coordinator.
+                    </div>
+                  )}
+                </div>
 
-          {/* Step 2: Report Duty Form */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 2</span>
-                <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}</strong>
-                </span>
+                <button
+                  disabled={lockOffer}
+                  onClick={() => updateStudentDocument(currentStudent.id, 'offerLetter', 'OfferLetter_GrandHyatt.pdf', 3)}
+                  className="mt-6 w-full py-2.5 bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
+                >
+                  <Upload size={14} /> 
+                  <span>{lockOffer ? 'Uploads Closed' : currentStudent?.documents?.offerLetter ? 'Replace Offer Letter' : 'Upload Offer Letter'}</span>
+                </button>
               </div>
 
-              <h4 className="font-extrabold text-base text-slate-800 mt-2">Endorsed Report Duty Form</h4>
-              <p className="text-xs text-slate-500 mt-1">Signed by company supervisor confirming reporting date.</p>
-              
-              {currentStudent?.documents?.reportDuty && (
-                <div className="mt-4 p-3 bg-slate-50 border rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2">
-                  <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.reportDuty}
-                </div>
-              )}
+              {/* Step 2: Report Duty Form */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 2</span>
+                    <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                      <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}</strong>
+                    </span>
+                  </div>
 
-              {lockDuty && (
-                <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
-                  <Lock size={14} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}). Upload locked by coordinator.
+                  <h4 className="font-extrabold text-base text-slate-800 mt-2">Endorsed Report Duty Form</h4>
+                  <p className="text-xs text-slate-500 mt-1">Signed by company supervisor confirming reporting date.</p>
+                  
+                  {currentStudent?.documents?.reportDuty && (
+                    <div className="mt-4 p-3 bg-slate-50 border rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2">
+                      <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.reportDuty}
+                    </div>
+                  )}
+
+                  {lockDuty && (
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
+                      <Lock size={14} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}). Upload locked by coordinator.
+                    </div>
+                  )}
                 </div>
-              )}
+
+                <button
+                  disabled={lockDuty}
+                  onClick={() => updateStudentDocument(currentStudent.id, 'reportDuty', 'ReportDuty_Signed.pdf', 4)}
+                  className="mt-6 w-full py-2.5 bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
+                >
+                  <Upload size={14} /> 
+                  <span>{lockDuty ? 'Uploads Closed' : currentStudent?.documents?.reportDuty ? 'Replace Report Duty Form' : 'Upload Report Duty Form'}</span>
+                </button>
+              </div>
             </div>
-
-            <button
-              disabled={lockDuty}
-              onClick={() => updateStudentDocument(currentStudent.id, 'reportDuty', 'ReportDuty_Signed.pdf', 4)}
-              className="mt-6 w-full py-2.5 bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
-            >
-              <Upload size={14} /> 
-              <span>{lockDuty ? 'Uploads Closed' : currentStudent?.documents?.reportDuty ? 'Replace Report Duty Form' : 'Upload Report Duty Form'}</span>
-            </button>
-          </div>
+          )}
         </div>
       )}
 
       {/* Phase 4: Submissions (with Individual Deadlines) */}
       {activeTab === 4 && (
-        <div className="space-y-6">
-          {currentStudent?.marks && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
-                <div>
-                  <h3 className="text-xl font-black text-slate-800">Final Grade Recorded: {currentStudent.marks}%</h3>
-                  <p className="text-xs text-slate-600 mt-0.5">Evaluated by: <strong>{currentStudent.lecturer}</strong></p>
-                </div>
-                {currentStudent.recommendation && (
-                  <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-300 self-start sm:self-auto">
-                    {currentStudent.recommendation}
-                  </span>
-                )}
-              </div>
+        <div>
+          {!isPhase2Unlocked ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center max-w-xl mx-auto my-8">
+              <Lock size={32} className="text-amber-500 mx-auto mb-3" />
+              <h3 className="font-extrabold text-lg text-slate-800 mb-2">Phase 4 Currently Gated</h3>
+              <p className="text-xs text-slate-600 mb-4">Internship submissions and grading rubrics are locked until prerequisite Phase 1 clearances (Bursary & Faculty) and official documents are issued.</p>
+              <div className="text-xs font-bold text-slate-500">Tip: Click "⚡ Quick Unlock Phase 2" in the top bar to test live unlock.</div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {currentStudent?.marks && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
+                    <div>
+                      <h3 className="text-xl font-black text-slate-800">Final Grade Recorded: {currentStudent.marks}%</h3>
+                      <p className="text-xs text-slate-600 mt-0.5">Evaluated by: <strong>{currentStudent.lecturer}</strong></p>
+                    </div>
+                    {currentStudent.recommendation && (
+                      <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-300 self-start sm:self-auto">
+                        {currentStudent.recommendation}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Section Explanations Grid */}
-              <div className="grid md:grid-cols-3 gap-3 text-xs">
-                <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
-                  <div className="font-bold text-slate-800 mb-1">Section A (Logbook) Remarks:</div>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    {currentStudent?.rubricScores?.sectionAExplanation || 'Verified consistent reflection logs.'}
-                  </p>
-                </div>
-                <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
-                  <div className="font-bold text-slate-800 mb-1">Section B (Report) Remarks:</div>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    {currentStudent?.rubricScores?.sectionBExplanation || 'Analytical depth and chapters evaluated.'}
-                  </p>
-                </div>
-                <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
-                  <div className="font-bold text-slate-800 mb-1">Section C (Conduct) Remarks:</div>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    {currentStudent?.rubricScores?.sectionCExplanation || 'Professional conduct endorsed by host mentor.'}
-                  </p>
-                </div>
-              </div>
+                  {/* Section Explanations Grid */}
+                  <div className="grid md:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
+                      <div className="font-bold text-slate-800 mb-1">Section A (Logbook) Remarks:</div>
+                      <p className="text-slate-600 text-[11px] leading-relaxed">
+                        {currentStudent?.rubricScores?.sectionAExplanation || 'Verified consistent reflection logs.'}
+                      </p>
+                    </div>
+                    <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
+                      <div className="font-bold text-slate-800 mb-1">Section B (Report) Remarks:</div>
+                      <p className="text-slate-600 text-[11px] leading-relaxed">
+                        {currentStudent?.rubricScores?.sectionBExplanation || 'Analytical depth and chapters evaluated.'}
+                      </p>
+                    </div>
+                    <div className="bg-white/80 p-3 rounded-xl border border-emerald-200">
+                      <div className="font-bold text-slate-800 mb-1">Section C (Conduct) Remarks:</div>
+                      <p className="text-slate-600 text-[11px] leading-relaxed">
+                        {currentStudent?.rubricScores?.sectionCExplanation || 'Professional conduct endorsed by host mentor.'}
+                      </p>
+                    </div>
+                  </div>
 
-              {currentStudent.feedback && (
-                <div className="bg-white/60 p-3 rounded-xl border border-emerald-200 text-xs text-slate-700">
-                  <strong className="font-bold text-slate-800">Supervisor Commendation:</strong> {currentStudent.feedback}
+                  {currentStudent.feedback && (
+                    <div className="bg-white/60 p-3 rounded-xl border border-emerald-200 text-xs text-slate-700">
+                      <strong className="font-bold text-slate-800">Supervisor Commendation:</strong> {currentStudent.feedback}
+                    </div>
+                  )}
                 </div>
               )}
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Weekly Logbook */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-slate-400">Section A (20 Marks)</span>
+                      <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)}</span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-800 mt-1">Completed Logbook</h4>
+                    <p className="text-xs text-slate-500 mt-1">12-week verified daily reflection entries.</p>
+                    {currentStudent?.documents?.logbook && (
+                      <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.logbook}</p>
+                    )}
+                    {lockLogbook && (
+                      <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)})</div>
+                    )}
+                  </div>
+                  <button 
+                    disabled={lockLogbook}
+                    onClick={() => updateStudentDocument(currentStudent.id, 'logbook', 'Final_Logbook.pdf')} 
+                    className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
+                  >
+                    {lockLogbook ? 'Locked' : 'Upload Logbook'}
+                  </button>
+                </div>
+
+                {/* Final Report */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-slate-400">Section B (60 Marks)</span>
+                      <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)}</span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-800 mt-1">Final Internship Report</h4>
+                    <p className="text-xs text-slate-500 mt-1">Chapters 1 to 5 with executive summary.</p>
+                    {currentStudent?.documents?.finalReport && (
+                      <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.finalReport}</p>
+                    )}
+                    {lockReport && (
+                      <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)})</div>
+                    )}
+                  </div>
+                  <button 
+                    disabled={lockReport}
+                    onClick={() => updateStudentDocument(currentStudent.id, 'finalReport', 'Internship_Report_Final.pdf')} 
+                    className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
+                  >
+                    {lockReport ? 'Locked' : 'Upload Report'}
+                  </button>
+                </div>
+
+                {/* Supervisor Evaluation */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-slate-400">Section C (20 Marks)</span>
+                      <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)}</span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-800 mt-1">Supervisor Evaluation</h4>
+                    <p className="text-xs text-slate-500 mt-1">Industry conduct assessment rubric.</p>
+                    {currentStudent?.documents?.supervisorEvaluation && (
+                      <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.supervisorEvaluation}</p>
+                    )}
+                    {lockEval && (
+                      <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)})</div>
+                    )}
+                  </div>
+                  <button 
+                    disabled={lockEval}
+                    onClick={() => updateStudentDocument(currentStudent.id, 'supervisorEvaluation', 'Supervisor_Eval.pdf')} 
+                    className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
+                  >
+                    {lockEval ? 'Locked' : 'Upload Evaluation'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Weekly Logbook */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-400">Section A (20 Marks)</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)}</span>
-                </div>
-                <h4 className="font-bold text-sm text-slate-800 mt-1">Completed Logbook</h4>
-                <p className="text-xs text-slate-500 mt-1">12-week verified daily reflection entries.</p>
-                {currentStudent?.documents?.logbook && (
-                  <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.logbook}</p>
-                )}
-                {lockLogbook && (
-                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)})</div>
-                )}
-              </div>
-              <button 
-                disabled={lockLogbook}
-                onClick={() => updateStudentDocument(currentStudent.id, 'logbook', 'Final_Logbook.pdf')} 
-                className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
-              >
-                {lockLogbook ? 'Locked' : 'Upload Logbook'}
-              </button>
-            </div>
-
-            {/* Final Report */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-400">Section B (60 Marks)</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)}</span>
-                </div>
-                <h4 className="font-bold text-sm text-slate-800 mt-1">Final Internship Report</h4>
-                <p className="text-xs text-slate-500 mt-1">Chapters 1 to 5 with executive summary.</p>
-                {currentStudent?.documents?.finalReport && (
-                  <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.finalReport}</p>
-                )}
-                {lockReport && (
-                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)})</div>
-                )}
-              </div>
-              <button 
-                disabled={lockReport}
-                onClick={() => updateStudentDocument(currentStudent.id, 'finalReport', 'Internship_Report_Final.pdf')} 
-                className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
-              >
-                {lockReport ? 'Locked' : 'Upload Report'}
-              </button>
-            </div>
-
-            {/* Supervisor Evaluation */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-400">Section C (20 Marks)</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)}</span>
-                </div>
-                <h4 className="font-bold text-sm text-slate-800 mt-1">Supervisor Evaluation</h4>
-                <p className="text-xs text-slate-500 mt-1">Industry conduct assessment rubric.</p>
-                {currentStudent?.documents?.supervisorEvaluation && (
-                  <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.supervisorEvaluation}</p>
-                )}
-                {lockEval && (
-                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)})</div>
-                )}
-              </div>
-              <button 
-                disabled={lockEval}
-                onClick={() => updateStudentDocument(currentStudent.id, 'supervisorEvaluation', 'Supervisor_Eval.pdf')} 
-                className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
-              >
-                {lockEval ? 'Locked' : 'Upload Evaluation'}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
