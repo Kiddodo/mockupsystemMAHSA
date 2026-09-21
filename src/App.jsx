@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
 import { LoginPage } from './components/auth/LoginPage';
@@ -11,7 +11,7 @@ export function App() {
   const { currentUser, toast } = useApp();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-['Nunito'] text-slate-800">
+    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
       {currentUser ? (
         <>
           <Navbar />

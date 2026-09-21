@@ -1,7 +1,24 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: Arial, Helvetica, sans-serif;
+  --default-font-family: Arial, Helvetica, sans-serif;
+}
+
+*, ::before, ::after {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+code, kbd, samp, pre, .font-mono {
+  font-family: Consolas, Monaco, "Courier New", monospace !important;
+}
+
+input, button, select, textarea {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 :root {
-  font-size: 17px;
+  font-size: 18.5px;
   --mahsa-blue: #003DA5;
   --mahsa-blue-dark: #002a74;
   --mahsa-blue-light: #1a55c0;
@@ -9,7 +26,8 @@
 }
 
 html {
-  font-size: 17px;
+  font-size: 18.5px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
