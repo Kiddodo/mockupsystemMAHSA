@@ -1,0 +1,11 @@
+﻿steps:
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Deploying to Google Cloud Project: mahsaims"
+        gcloud app deploy app.yaml --project=mahsaims --quiet
+timeout: '600s'
+options:
+  logging: CLOUD_LOGGING_ONLY
