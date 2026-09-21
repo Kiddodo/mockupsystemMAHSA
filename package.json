@@ -1,0 +1,36 @@
+{
+    "name":  "mahsainternmanagementsystem",
+    "version":  "1.0.0",
+    "description":  "A web application prototype for managing internship workflows across Coordinators, Lecturers, and Students.",
+    "main":  "index.js",
+    "scripts":  {
+                    "dev":  "vite",
+                    "build":  "vite build",
+                    "preview":  "vite preview"
+                },
+    "repository":  {
+                       "type":  "git",
+                       "url":  "git+https://github.com/Kiddodo/mockupsystemMAHSA.git"
+                   },
+    "keywords":  [
+
+                 ],
+    "author":  "",
+    "license":  "ISC",
+    "type":  "module",
+    "bugs":  {
+                 "url":  "https://github.com/Kiddodo/mockupsystemMAHSA/issues"
+             },
+    "homepage":  "https://github.com/Kiddodo/mockupsystemMAHSA#readme",
+    "dependencies":  {
+                         "lucide-react":  "^1.47.0",
+                         "react":  "^19.3.0",
+                         "react-dom":  "^19.3.0"
+                     },
+    "devDependencies":  {
+                            "@tailwindcss/vite":  "^4.3.3",
+                            "@vitejs/plugin-react":  "^6.1.1",
+                            "tailwindcss":  "^4.3.3",
+                            "vite":  "^8.3.0"
+                        }
+}
