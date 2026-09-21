@@ -2,11 +2,15 @@
 import { useApp } from '../../context/AppContext';
 import { 
   CheckCircle2, Clock, Lock, FileText, Download, Upload, 
-  AlertCircle, Eye, Check
+  AlertCircle, Eye, Check, Calendar
 } from 'lucide-react';
 
 export const StudentDashboard = () => {
-  const { currentStudent, submitPhase1Registration, updateStudentDocument, deadline, isUploadLocked, showToast } = useApp();
+  const { 
+    currentStudent, submitPhase1Registration, updateStudentDocument, 
+    deadlines, isSubmissionLocked, showToast 
+  } = useApp();
+
   const [activeTab, setActiveTab] = useState(currentStudent?.phase || 1);
   const [showSalModal, setShowSalModal] = useState(false);
 
@@ -25,7 +29,14 @@ export const StudentDashboard = () => {
   };
 
   const isPhase2Unlocked = currentStudent?.financeCleared && currentStudent?.facultyApproved;
-  const locked = isUploadLocked();
+
+  // Individual submission lock states
+  const lockPhase1 = isSubmissionLocked('phase1_registration');
+  const lockOffer = isSubmissionLocked('phase3_offer');
+  const lockDuty = isSubmissionLocked('phase3_duty');
+  const lockLogbook = isSubmissionLocked('phase4_logbook');
+  const lockReport = isSubmissionLocked('phase4_report');
+  const lockEval = isSubmissionLocked('phase4_evaluation');
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -39,7 +50,7 @@ export const StudentDashboard = () => {
           </div>
           <h1 className="text-2xl sm:text-3xl font-black">{currentStudent?.name}</h1>
           <p className="text-blue-100 text-sm mt-1">
-            Assigned Evaluator: <strong className="text-white font-bold">{currentStudent?.lecturer}</strong> · Company: {currentStudent?.company}
+            Assigned Evaluator: <strong className="text-white font-bold">{currentStudent?.lecturer}</strong> · Host Company: {currentStudent?.company}
           </p>
         </div>
 
@@ -55,20 +66,12 @@ export const StudentDashboard = () => {
               {isPhase2Unlocked ? 'Clearances Endorsed' : 'Pending Approvals'}
             </span>
           </div>
-          <div className="text-[11px] text-blue-200 mt-2">
-            Submission Deadline: <strong>{deadline}</strong>
+          <div className="text-[11px] text-blue-200 mt-2 flex items-center gap-1">
+            <Calendar size={12} />
+            <span>Registration Cut-off: <strong>{deadlines.phase1_registration?.date}</strong></span>
           </div>
         </div>
       </div>
-
-      {locked && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
-          <AlertCircle size={20} className="flex-shrink-0" />
-          <div className="text-sm">
-            <strong className="font-bold">Submissions Locked:</strong> Coordinator deadline passed and auto-lock is active.
-          </div>
-        </div>
-      )}
 
       {/* Phase Navigation Tabs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -132,9 +135,9 @@ export const StudentDashboard = () => {
             <div className={`p-5 rounded-xl border ${currentStudent?.financeCleared ? 'bg-emerald-50/70 border-emerald-200' : 'bg-amber-50/70 border-amber-200'}`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Clearance 1</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Department Clearance 1</span>
                   <h3 className="font-extrabold text-base text-slate-800 mt-1">Finance & Bursary Clearance</h3>
-                  <p className="text-xs text-slate-600 mt-1">Verifies tuition fee status and no outstanding balance.</p>
+                  <p className="text-xs text-slate-600 mt-1">Verifies tuition fee status and zero outstanding arrears.</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${currentStudent?.financeCleared ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
                   {currentStudent?.financeCleared ? '✓ Cleared' : '⏳ Pending Review'}
@@ -145,7 +148,7 @@ export const StudentDashboard = () => {
             <div className={`p-5 rounded-xl border ${currentStudent?.facultyApproved ? 'bg-emerald-50/70 border-emerald-200' : 'bg-amber-50/70 border-amber-200'}`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Clearance 2</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Department Clearance 2</span>
                   <h3 className="font-extrabold text-base text-slate-800 mt-1">Faculty Academic Eligibility</h3>
                   <p className="text-xs text-slate-600 mt-1">CGPA: {currentStudent?.cgpa} (≥2.00) · Credits: {currentStudent?.credits} (≥60).</p>
                 </div>
@@ -157,8 +160,21 @@ export const StudentDashboard = () => {
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-            <h3 className="font-extrabold text-lg text-slate-800 mb-1">Registration & Re-enrolment for Internship Form</h3>
-            <p className="text-xs text-slate-500 mb-6">Review your student details and submit for departmental endorsement.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+              <div>
+                <h3 className="font-extrabold text-lg text-slate-800">Registration & Re-enrolment for Internship Form</h3>
+                <p className="text-xs text-slate-500">Review your student details and submit for departmental endorsement.</p>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-slate-500 font-semibold">Cut-off Deadline:</span>
+                <span className="font-bold bg-slate-100 px-2.5 py-1 rounded-md text-slate-800 font-mono">
+                  {deadlines.phase1_registration?.date}
+                </span>
+                {lockPhase1 && (
+                  <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">🔒 Locked</span>
+                )}
+              </div>
+            </div>
 
             <form onSubmit={handlePhase1Submit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -172,25 +188,30 @@ export const StudentDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">IC / Passport Number</label>
-                  <input type="text" value={formData.icPassport} onChange={e => setFormData({...formData, icPassport: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
+                  <input type="text" disabled={lockPhase1} value={formData.icPassport} onChange={e => setFormData({...formData, icPassport: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">Contact Phone</label>
-                  <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
+                  <input type="text" disabled={lockPhase1} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">Preferred Industry</label>
-                  <input type="text" value={formData.preferredIndustry} onChange={e => setFormData({...formData, preferredIndustry: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
+                  <input type="text" disabled={lockPhase1} value={formData.preferredIndustry} onChange={e => setFormData({...formData, preferredIndustry: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">Target Location</label>
-                  <input type="text" value={formData.preferredLocation} onChange={e => setFormData({...formData, preferredLocation: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
+                  <input type="text" disabled={lockPhase1} value={formData.preferredLocation} onChange={e => setFormData({...formData, preferredLocation: e.target.value})} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100" />
                 </div>
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex justify-end">
-                <button type="submit" className="bg-[#003DA5] hover:bg-[#002a74] text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow flex items-center gap-2">
-                  <Check size={16} /> Save & Submit Registration
+                <button 
+                  type="submit" 
+                  disabled={lockPhase1}
+                  className="bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow flex items-center gap-2"
+                >
+                  <Check size={16} /> 
+                  <span>{lockPhase1 ? 'Submissions Closed' : 'Save & Submit Registration'}</span>
                 </button>
               </div>
             </form>
@@ -204,7 +225,7 @@ export const StudentDashboard = () => {
           {!isPhase2Unlocked ? (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center max-w-xl mx-auto my-8">
               <Lock size={32} className="text-amber-500 mx-auto mb-3" />
-              <h3 className="font-extrabold text-lg text-slate-800 mb-2">Phase 2 Currently Locked</h3>
+              <h3 className="font-extrabold text-lg text-slate-800 mb-2">Phase 2 Currently Gated</h3>
               <p className="text-xs text-slate-600 mb-4">Awaiting Finance (Bursary) and Faculty Academic endorsements before releasing official SAL.</p>
               <div className="text-xs font-bold text-slate-500">Tip: Click "⚡ Quick Unlock Phase 2" in the top bar to test live unlock.</div>
             </div>
@@ -260,52 +281,84 @@ export const StudentDashboard = () => {
         </div>
       )}
 
-      {/* Phase 3: Offer & Report Duty */}
+      {/* Phase 3: Offer & Report Duty (with Individual Deadlines) */}
       {activeTab === 3 && (
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
+          {/* Step 1: Offer Letter */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
             <div>
-              <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 1</span>
-              <h4 className="font-extrabold text-base text-slate-800 mt-3">Company Offer Letter</h4>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 1</span>
+                <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{deadlines.phase3_offer?.date}</strong>
+                </span>
+              </div>
+              
+              <h4 className="font-extrabold text-base text-slate-800 mt-2">Company Offer Letter</h4>
               <p className="text-xs text-slate-500 mt-1">Official acceptance letter with internship allowance and tenure.</p>
+              
               {currentStudent?.documents?.offerLetter && (
                 <div className="mt-4 p-3 bg-slate-50 border rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2">
                   <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.offerLetter}
                 </div>
               )}
+
+              {lockOffer && (
+                <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
+                  <Lock size={14} /> Cut-off deadline has passed. Upload locked by coordinator.
+                </div>
+              )}
             </div>
+
             <button
-              disabled={locked}
+              disabled={lockOffer}
               onClick={() => updateStudentDocument(currentStudent.id, 'offerLetter', 'OfferLetter_GrandHyatt.pdf', 3)}
-              className="mt-6 w-full py-2.5 bg-[#003DA5] text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
+              className="mt-6 w-full py-2.5 bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
             >
-              <Upload size={14} /> Upload Offer Letter
+              <Upload size={14} /> 
+              <span>{lockOffer ? 'Uploads Closed' : currentStudent?.documents?.offerLetter ? 'Replace Offer Letter' : 'Upload Offer Letter'}</span>
             </button>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
+          {/* Step 2: Report Duty Form */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
             <div>
-              <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 2</span>
-              <h4 className="font-extrabold text-base text-slate-800 mt-3">Report Duty Form</h4>
-              <p className="text-xs text-slate-500 mt-1">Signed by company supervisor confirming your reporting date.</p>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 2</span>
+                <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{deadlines.phase3_duty?.date}</strong>
+                </span>
+              </div>
+
+              <h4 className="font-extrabold text-base text-slate-800 mt-2">Endorsed Report Duty Form</h4>
+              <p className="text-xs text-slate-500 mt-1">Signed by company supervisor confirming reporting date.</p>
+              
               {currentStudent?.documents?.reportDuty && (
                 <div className="mt-4 p-3 bg-slate-50 border rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2">
                   <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.reportDuty}
                 </div>
               )}
+
+              {lockDuty && (
+                <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
+                  <Lock size={14} /> Cut-off deadline has passed. Upload locked by coordinator.
+                </div>
+              )}
             </div>
+
             <button
-              disabled={locked}
+              disabled={lockDuty}
               onClick={() => updateStudentDocument(currentStudent.id, 'reportDuty', 'ReportDuty_Signed.pdf', 4)}
-              className="mt-6 w-full py-2.5 bg-[#003DA5] text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
+              className="mt-6 w-full py-2.5 bg-[#003DA5] hover:bg-[#002a74] disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2"
             >
-              <Upload size={14} /> Upload Report Duty Form
+              <Upload size={14} /> 
+              <span>{lockDuty ? 'Uploads Closed' : currentStudent?.documents?.reportDuty ? 'Replace Report Duty Form' : 'Upload Report Duty Form'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Phase 4: Submissions */}
+      {/* Phase 4: Submissions (with Individual Deadlines) */}
       {activeTab === 4 && (
         <div className="space-y-6">
           {currentStudent?.marks && (
@@ -318,31 +371,79 @@ export const StudentDashboard = () => {
           )}
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
+            {/* Weekly Logbook */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
               <div>
-                <span className="text-[11px] font-bold text-slate-400">Section A (20 Marks)</span>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold text-slate-400">Section A (20 Marks)</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">{deadlines.phase4_logbook?.date}</span>
+                </div>
                 <h4 className="font-bold text-sm text-slate-800 mt-1">Completed Logbook</h4>
-                <p className="text-xs text-slate-500 mt-1">12-week daily entries.</p>
+                <p className="text-xs text-slate-500 mt-1">12-week verified daily reflection entries.</p>
+                {currentStudent?.documents?.logbook && (
+                  <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.logbook}</p>
+                )}
+                {lockLogbook && (
+                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed)</div>
+                )}
               </div>
-              <button onClick={() => updateStudentDocument(currentStudent.id, 'logbook', 'Final_Logbook.pdf')} className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white text-xs font-bold rounded-lg transition">Upload Logbook</button>
+              <button 
+                disabled={lockLogbook}
+                onClick={() => updateStudentDocument(currentStudent.id, 'logbook', 'Final_Logbook.pdf')} 
+                className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
+              >
+                {lockLogbook ? 'Locked' : 'Upload Logbook'}
+              </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
+            {/* Final Report */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
               <div>
-                <span className="text-[11px] font-bold text-slate-400">Section B (60 Marks)</span>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold text-slate-400">Section B (60 Marks)</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">{deadlines.phase4_report?.date}</span>
+                </div>
                 <h4 className="font-bold text-sm text-slate-800 mt-1">Final Internship Report</h4>
-                <p className="text-xs text-slate-500 mt-1">Chapters 1 to 5.</p>
+                <p className="text-xs text-slate-500 mt-1">Chapters 1 to 5 with executive summary.</p>
+                {currentStudent?.documents?.finalReport && (
+                  <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.finalReport}</p>
+                )}
+                {lockReport && (
+                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed)</div>
+                )}
               </div>
-              <button onClick={() => updateStudentDocument(currentStudent.id, 'finalReport', 'Internship_Report_Final.pdf')} className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white text-xs font-bold rounded-lg transition">Upload Report</button>
+              <button 
+                disabled={lockReport}
+                onClick={() => updateStudentDocument(currentStudent.id, 'finalReport', 'Internship_Report_Final.pdf')} 
+                className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
+              >
+                {lockReport ? 'Locked' : 'Upload Report'}
+              </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
+            {/* Supervisor Evaluation */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
               <div>
-                <span className="text-[11px] font-bold text-slate-400">Section C (20 Marks)</span>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold text-slate-400">Section C (20 Marks)</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">{deadlines.phase4_evaluation?.date}</span>
+                </div>
                 <h4 className="font-bold text-sm text-slate-800 mt-1">Supervisor Evaluation</h4>
-                <p className="text-xs text-slate-500 mt-1">Industry conduct assessment.</p>
+                <p className="text-xs text-slate-500 mt-1">Industry conduct assessment rubric.</p>
+                {currentStudent?.documents?.supervisorEvaluation && (
+                  <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.supervisorEvaluation}</p>
+                )}
+                {lockEval && (
+                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed)</div>
+                )}
               </div>
-              <button onClick={() => updateStudentDocument(currentStudent.id, 'supervisorEvaluation', 'Supervisor_Eval.pdf')} className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white text-xs font-bold rounded-lg transition">Upload Evaluation</button>
+              <button 
+                disabled={lockEval}
+                onClick={() => updateStudentDocument(currentStudent.id, 'supervisorEvaluation', 'Supervisor_Eval.pdf')} 
+                className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-bold rounded-lg transition"
+              >
+                {lockEval ? 'Locked' : 'Upload Evaluation'}
+              </button>
             </div>
           </div>
         </div>

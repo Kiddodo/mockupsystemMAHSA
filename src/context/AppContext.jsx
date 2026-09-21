@@ -1,15 +1,59 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState } from 'react';
 import { INITIAL_STUDENTS } from '../data/mockData';
 
 const AppContext = createContext();
 
+export const DEFAULT_SUBMISSION_DEADLINES = {
+  phase1_registration: {
+    title: 'Registration & Re-Enrolment Form',
+    phase: 1,
+    date: '2026-09-15',
+    autoLock: false,
+    description: 'Student personal academic registration and dual-clearance initiation.'
+  },
+  phase3_offer: {
+    title: 'Company Offer Letter & Reply Form',
+    phase: 3,
+    date: '2026-09-30',
+    autoLock: false,
+    description: 'Signed industrial placement offer letter from employer.'
+  },
+  phase3_duty: {
+    title: 'Endorsed Report Duty Form',
+    phase: 3,
+    date: '2026-10-14',
+    autoLock: false,
+    description: 'Signed confirmation of commencement within first 14 days of placement.'
+  },
+  phase4_logbook: {
+    title: 'Completed Weekly Logbook',
+    phase: 4,
+    date: '2026-11-20',
+    autoLock: false,
+    description: '12-week verified daily reflection entries and supervisor sign-offs.'
+  },
+  phase4_report: {
+    title: 'Final Internship Report',
+    phase: 4,
+    date: '2026-11-25',
+    autoLock: false,
+    description: 'Comprehensive 5-chapter report with executive summary.'
+  },
+  phase4_evaluation: {
+    title: 'Industry Supervisor Evaluation Form',
+    phase: 4,
+    date: '2026-11-30',
+    autoLock: false,
+    description: 'Confidential conduct and performance rubric scored by host mentor.'
+  }
+};
+
 export const AppProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null); // { role, name, email, studentId }
+  const [currentUser, setCurrentUser] = useState(null);
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [session, setSession] = useState('SEP2026');
   const [selectedProgram, setSelectedProgram] = useState('ALL');
-  const [deadline, setDeadline] = useState('2026-09-30');
-  const [autoLock, setAutoLock] = useState(false);
+  const [deadlines, setDeadlines] = useState(DEFAULT_SUBMISSION_DEADLINES);
   const [toast, setToast] = useState(null);
 
   // Active student for student view (defaults to Abdul Halim)
@@ -22,6 +66,50 @@ export const AppProvider = ({ children }) => {
     setTimeout(() => {
       setToast(null);
     }, 4000);
+  };
+
+  // Individual deadline and auto-lock methods
+  const updateSubmissionDeadline = (key, newDate) => {
+    setDeadlines(prev => ({
+      ...prev,
+      [key]: { ...prev[key], date: newDate }
+    }));
+    showToast(`Deadline for ${deadlines[key]?.title} updated to ${newDate}.`, 'success');
+  };
+
+  const toggleSubmissionAutoLock = (key) => {
+    setDeadlines(prev => {
+      const nextState = !prev[key].autoLock;
+      return {
+        ...prev,
+        [key]: { ...prev[key], autoLock: nextState }
+      };
+    });
+    const item = deadlines[key];
+    showToast(`Auto-lock for ${item?.title} ${!item?.autoLock ? 'enabled' : 'disabled'}.`, 'info');
+  };
+
+  const setAllAutoLocks = (enable) => {
+    setDeadlines(prev => {
+      const updated = {};
+      Object.keys(prev).forEach(k => {
+        updated[k] = { ...prev[k], autoLock: enable };
+      });
+      return updated;
+    });
+    showToast(`All submission auto-locks ${enable ? 'enabled' : 'disabled'}.`, 'info');
+  };
+
+  const isSubmissionDeadlinePassed = (key) => {
+    const item = deadlines[key];
+    if (!item || !item.date) return false;
+    return new Date(item.date + 'T23:59:59') < new Date();
+  };
+
+  const isSubmissionLocked = (key) => {
+    const item = deadlines[key];
+    if (!item) return false;
+    return item.autoLock && isSubmissionDeadlinePassed(key);
   };
 
   // Approval Handlers for Coordinator
@@ -77,7 +165,6 @@ export const AppProvider = ({ children }) => {
     showToast('Student granted both Finance & Faculty approvals. Phase 2 unlocked!', 'success');
   };
 
-  // Student Submits Phase 1 Registration
   const submitPhase1Registration = (studentId, formData) => {
     setStudents(prev => prev.map(s => {
       if (s.id === studentId) {
@@ -93,7 +180,6 @@ export const AppProvider = ({ children }) => {
     showToast('Registration submitted! Awaiting Finance and Faculty clearance.', 'success');
   };
 
-  // Student Uploads Document in Phase 3 or Phase 4
   const updateStudentDocument = (studentId, docKey, filename, advancePhaseTo = null) => {
     setStudents(prev => prev.map(s => {
       if (s.id === studentId) {
@@ -115,7 +201,6 @@ export const AppProvider = ({ children }) => {
     showToast(`${filename} uploaded successfully.`, 'success');
   };
 
-  // Submit Final Grading
   const submitStudentMarks = (studentId, { total, rubricScores, feedback, recommendation }) => {
     setStudents(prev => prev.map(s => {
       if (s.id === studentId) {
@@ -133,15 +218,6 @@ export const AppProvider = ({ children }) => {
     showToast(`Final grade of ${total}% recorded for student.`, 'success');
   };
 
-  // Check deadline status
-  const isDeadlinePassed = () => {
-    return new Date(deadline + 'T23:59:59') < new Date();
-  };
-
-  const isUploadLocked = () => {
-    return autoLock && isDeadlinePassed();
-  };
-
   return (
     <AppContext.Provider
       value={{
@@ -153,10 +229,12 @@ export const AppProvider = ({ children }) => {
         setSession,
         selectedProgram,
         setSelectedProgram,
-        deadline,
-        setDeadline,
-        autoLock,
-        setAutoLock,
+        deadlines,
+        updateSubmissionDeadline,
+        toggleSubmissionAutoLock,
+        setAllAutoLocks,
+        isSubmissionDeadlinePassed,
+        isSubmissionLocked,
         toast,
         showToast,
         toggleFinanceClearance,
@@ -164,9 +242,7 @@ export const AppProvider = ({ children }) => {
         approveBothClearances,
         submitPhase1Registration,
         updateStudentDocument,
-        submitStudentMarks,
-        isDeadlinePassed,
-        isUploadLocked
+        submitStudentMarks
       }}
     >
       {children}

@@ -2,20 +2,23 @@
 import { useApp } from '../../context/AppContext';
 import { 
   Users, CheckCircle, Clock, Building2, Upload, FileSpreadsheet, 
-  Lock, Unlock, Search, ShieldCheck, Mail, FolderOpen, AlertCircle
+  Lock, Unlock, Search, ShieldCheck, Mail, FolderOpen, AlertCircle,
+  Calendar, Check, SlidersHorizontal, ShieldAlert, Sparkles
 } from 'lucide-react';
 
 export const CoordinatorDashboard = () => {
   const { 
-    students, session, selectedProgram, deadline, setDeadline, 
-    autoLock, setAutoLock, toggleFinanceClearance, toggleFacultyApproval, 
-    showToast 
+    students, session, selectedProgram, deadlines, 
+    updateSubmissionDeadline, toggleSubmissionAutoLock, setAllAutoLocks,
+    isSubmissionDeadlinePassed, isSubmissionLocked,
+    toggleFinanceClearance, toggleFacultyApproval, showToast 
   } = useApp();
 
   const [search, setSearch] = useState('');
   const [filterClearance, setFilterClearance] = useState('ALL');
   const [selectedFolderStudent, setSelectedFolderStudent] = useState(null);
   const [emailModalStudent, setEmailModalStudent] = useState(null);
+  const [deadlineTab, setDeadlineTab] = useState('ALL'); // ALL, PHASE1, PHASE3, PHASE4
 
   // Statistics
   const totalStudents = students.length;
@@ -36,6 +39,14 @@ export const CoordinatorDashboard = () => {
     return matchesSearch && matchesProgram && matchesClearance;
   });
 
+  const deadlineEntries = Object.entries(deadlines).filter(([key, val]) => {
+    if (deadlineTab === 'ALL') return true;
+    if (deadlineTab === 'PHASE1') return val.phase === 1;
+    if (deadlineTab === 'PHASE3') return val.phase === 3;
+    if (deadlineTab === 'PHASE4') return val.phase === 4;
+    return true;
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -43,7 +54,7 @@ export const CoordinatorDashboard = () => {
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-800">Coordinator Admin Dashboard</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Session: <strong className="text-slate-700">{session}</strong> · Centralized Approvals & Internship Administration
+            Session: <strong className="text-slate-700">{session}</strong> · Individual Submission Gating & Clearances
           </p>
         </div>
 
@@ -113,41 +124,126 @@ export const CoordinatorDashboard = () => {
         </div>
       </div>
 
-      {/* Control Panel: Deadline & Auto-Lock */}
+      {/* NEW: Individual Submission Deadlines & Auto-Lock Control Manager */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-4">
           <div>
-            <h3 className="font-extrabold text-base text-slate-800">Deadline & Upload Gating Control</h3>
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal size={18} className="text-[#003DA5]" />
+              <h3 className="font-extrabold text-base text-slate-800">Individual Submission Cut-offs & Auto-Lock Control</h3>
+            </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Set global cut-off dates. When Auto Lock is enabled, student upload actions are disabled automatically after deadline.
+              Configure independent deadlines and automated lockout rules for each submission tab.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-bold text-slate-600">Cut-off Date:</label>
-              <input
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-[#003DA5] outline-none"
-              />
-            </div>
+          {/* Quick Global Toggles */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setAllAutoLocks(true)}
+              className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition"
+            >
+              Arm All Auto-Locks
+            </button>
+            <button
+              onClick={() => setAllAutoLocks(false)}
+              className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition"
+            >
+              Disable All Auto-Locks
+            </button>
+          </div>
+        </div>
 
-            <div className="flex items-center gap-2 pl-4 border-l border-slate-200">
-              <label className="text-xs font-bold text-slate-600">Auto-Lock:</label>
-              <button
-                type="button"
-                onClick={() => setAutoLock(!autoLock)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
-                  autoLock ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+        {/* Phase Filter Tabs */}
+        <div className="flex space-x-2 my-4">
+          {[
+            { id: 'ALL', label: 'All Submissions (6)' },
+            { id: 'PHASE1', label: 'Phase 1 (Registration)' },
+            { id: 'PHASE3', label: 'Phase 3 (Placement)' },
+            { id: 'PHASE4', label: 'Phase 4 (Final Evaluation)' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setDeadlineTab(tab.id)}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                deadlineTab === tab.id 
+                  ? 'bg-[#003DA5] text-white' 
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Individual Deadlines Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {deadlineEntries.map(([key, item]) => {
+            const isPassed = isSubmissionDeadlinePassed(key);
+            const isLocked = isSubmissionLocked(key);
+
+            return (
+              <div 
+                key={key} 
+                className={`p-4 rounded-xl border transition flex flex-col justify-between ${
+                  isLocked ? 'bg-red-50/50 border-red-200' : item.autoLock ? 'bg-blue-50/50 border-blue-200' : 'bg-slate-50 border-slate-200'
                 }`}
               >
-                {autoLock ? <Lock size={14} /> : <Unlock size={14} />}
-                <span>{autoLock ? 'Locked / Active' : 'Disabled'}</span>
-              </button>
-            </div>
-          </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
+                      Phase {item.phase}
+                    </span>
+                    {/* Status Badge */}
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      isLocked 
+                        ? 'bg-red-100 text-red-700 border-red-300' 
+                        : item.autoLock 
+                        ? 'bg-blue-100 text-blue-700 border-blue-300' 
+                        : 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    }`}>
+                      {isLocked ? '🔒 Locked (Expired)' : item.autoLock ? '🛡️ Auto-Lock Armed' : '🔓 Open (Manual)'}
+                    </span>
+                  </div>
+
+                  <h4 className="font-bold text-sm text-slate-800">{item.title}</h4>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-tight">{item.description}</p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-200/60 space-y-3">
+                  {/* Date Input */}
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">
+                      Cut-off Date:
+                    </label>
+                    <input
+                      type="date"
+                      value={item.date}
+                      onChange={(e) => updateSubmissionDeadline(key, e.target.value)}
+                      className="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-[#003DA5] outline-none shadow-sm"
+                    />
+                  </div>
+
+                  {/* Auto-lock Switch */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-600">Auto-Lock Uploads:</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleSubmissionAutoLock(key)}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                        item.autoLock 
+                          ? 'bg-red-600 text-white shadow-sm' 
+                          : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                      }`}
+                    >
+                      {item.autoLock ? <Lock size={12} /> : <Unlock size={12} />}
+                      <span>{item.autoLock ? 'Enabled' : 'Disabled'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
