@@ -325,8 +325,8 @@ export const StudentDashboard = () => {
                   )}
 
                   {lockOffer && (
-                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium flex items-center gap-1.5">
-                      <Lock size={13} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}). Upload locked.
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium">
+                      Cut-off deadline has passed ({formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}). Upload locked.
                     </div>
                   )}
                 </div>
@@ -361,8 +361,8 @@ export const StudentDashboard = () => {
                   )}
 
                   {lockDuty && (
-                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium flex items-center gap-1.5">
-                      <Lock size={13} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}). Upload locked.
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium">
+                      Cut-off deadline has passed ({formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}). Upload locked.
                     </div>
                   )}
                 </div>

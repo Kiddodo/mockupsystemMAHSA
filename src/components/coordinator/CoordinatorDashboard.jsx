@@ -247,13 +247,12 @@ export const CoordinatorDashboard = () => {
                     <button
                       type="button"
                       onClick={() => toggleSubmissionAutoLock(key)}
-                      className={`px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1 transition ${
+                      className={`px-2.5 py-0.5 rounded text-xs font-semibold transition ${
                         item.autoLock 
                           ? 'bg-red-600 text-white' 
                           : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                       }`}
                     >
-                      {item.autoLock ? <Lock size={11} /> : <Unlock size={11} />}
                       <span>{item.autoLock ? 'Armed' : 'Off'}</span>
                     </button>
                   </div>
