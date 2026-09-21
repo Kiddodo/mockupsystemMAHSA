@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Users, CheckCircle, Clock, Building2, Upload, FileSpreadsheet, 
@@ -10,7 +10,7 @@ export const CoordinatorDashboard = () => {
   const { 
     students, session, selectedProgram, deadlines, 
     updateSubmissionDeadline, toggleSubmissionAutoLock, setAllAutoLocks,
-    isSubmissionDeadlinePassed, isSubmissionLocked,
+    isSubmissionDeadlinePassed, isSubmissionLocked, formatDeadline,
     toggleFinanceClearance, toggleFacultyApproval, showToast 
   } = useApp();
 
@@ -211,17 +211,34 @@ export const CoordinatorDashboard = () => {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-200/60 space-y-3">
-                  {/* Date Input */}
-                  <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">
-                      Cut-off Date:
-                    </label>
-                    <input
-                      type="date"
-                      value={item.date}
-                      onChange={(e) => updateSubmissionDeadline(key, e.target.value)}
-                      className="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-[#003DA5] outline-none shadow-sm"
-                    />
+                  {/* Date and Time Inputs */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                        <Calendar size={11} /> Cut-off Date
+                      </label>
+                      <input
+                        type="date"
+                        value={item.date}
+                        onChange={(e) => updateSubmissionDeadline(key, e.target.value, item.time)}
+                        className="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-[#003DA5] outline-none shadow-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1 flex items-center gap-1">
+                        <Clock size={11} /> Cut-off Time
+                      </label>
+                      <input
+                        type="time"
+                        value={item.time || '23:59'}
+                        onChange={(e) => updateSubmissionDeadline(key, item.date, e.target.value)}
+                        className="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-[#003DA5] outline-none shadow-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-slate-500 font-medium">
+                    Deadline: <strong className="text-slate-700">{formatDeadline(item.date, item.time)}</strong>
                   </div>
 
                   {/* Auto-lock Switch */}

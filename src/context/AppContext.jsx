@@ -8,6 +8,7 @@ export const DEFAULT_SUBMISSION_DEADLINES = {
     title: 'Registration & Re-Enrolment Form',
     phase: 1,
     date: '2026-09-15',
+    time: '23:59',
     autoLock: false,
     description: 'Student personal academic registration and dual-clearance initiation.'
   },
@@ -15,6 +16,7 @@ export const DEFAULT_SUBMISSION_DEADLINES = {
     title: 'Company Offer Letter & Reply Form',
     phase: 3,
     date: '2026-09-30',
+    time: '17:00',
     autoLock: false,
     description: 'Signed industrial placement offer letter from employer.'
   },
@@ -22,6 +24,7 @@ export const DEFAULT_SUBMISSION_DEADLINES = {
     title: 'Endorsed Report Duty Form',
     phase: 3,
     date: '2026-10-14',
+    time: '23:59',
     autoLock: false,
     description: 'Signed confirmation of commencement within first 14 days of placement.'
   },
@@ -29,6 +32,7 @@ export const DEFAULT_SUBMISSION_DEADLINES = {
     title: 'Completed Weekly Logbook',
     phase: 4,
     date: '2026-11-20',
+    time: '23:59',
     autoLock: false,
     description: '12-week verified daily reflection entries and supervisor sign-offs.'
   },
@@ -36,6 +40,7 @@ export const DEFAULT_SUBMISSION_DEADLINES = {
     title: 'Final Internship Report',
     phase: 4,
     date: '2026-11-25',
+    time: '17:00',
     autoLock: false,
     description: 'Comprehensive 5-chapter report with executive summary.'
   },
@@ -43,8 +48,23 @@ export const DEFAULT_SUBMISSION_DEADLINES = {
     title: 'Industry Supervisor Evaluation Form',
     phase: 4,
     date: '2026-11-30',
+    time: '23:59',
     autoLock: false,
     description: 'Confidential conduct and performance rubric scored by host mentor.'
+  }
+};
+
+export const formatDeadline = (dateStr, timeStr = '23:59') => {
+  if (!dateStr) return '';
+  try {
+    const [year, month, day] = dateStr.split('-');
+    const [hours, minutes] = (timeStr || '23:59').split(':');
+    const d = new Date(year, month - 1, day, hours, minutes);
+    const dateFormatted = d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeFormatted = d.toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${dateFormatted}, ${timeFormatted}`;
+  } catch (e) {
+    return `${dateStr} ${timeStr || ''}`.trim();
   }
 };
 
@@ -68,13 +88,18 @@ export const AppProvider = ({ children }) => {
     }, 4000);
   };
 
-  // Individual deadline and auto-lock methods
-  const updateSubmissionDeadline = (key, newDate) => {
+  // Individual deadline (date + time) and auto-lock methods
+  const updateSubmissionDeadline = (key, newDate, newTime) => {
     setDeadlines(prev => ({
       ...prev,
-      [key]: { ...prev[key], date: newDate }
+      [key]: { 
+        ...prev[key], 
+        date: newDate !== undefined ? newDate : prev[key].date,
+        time: newTime !== undefined ? newTime : (prev[key].time || '23:59')
+      }
     }));
-    showToast(`Deadline for ${deadlines[key]?.title} updated to ${newDate}.`, 'success');
+    const item = deadlines[key];
+    showToast(`Deadline for ${item?.title} updated to ${newDate || item.date} at ${newTime || item.time || '23:59'}.`, 'success');
   };
 
   const toggleSubmissionAutoLock = (key) => {
@@ -103,7 +128,8 @@ export const AppProvider = ({ children }) => {
   const isSubmissionDeadlinePassed = (key) => {
     const item = deadlines[key];
     if (!item || !item.date) return false;
-    return new Date(item.date + 'T23:59:59') < new Date();
+    const timeStr = item.time || '23:59';
+    return new Date(`${item.date}T${timeStr}:00`) < new Date();
   };
 
   const isSubmissionLocked = (key) => {
@@ -235,6 +261,7 @@ export const AppProvider = ({ children }) => {
         setAllAutoLocks,
         isSubmissionDeadlinePassed,
         isSubmissionLocked,
+        formatDeadline,
         toast,
         showToast,
         toggleFinanceClearance,

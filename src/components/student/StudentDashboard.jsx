@@ -8,7 +8,7 @@ import {
 export const StudentDashboard = () => {
   const { 
     currentStudent, submitPhase1Registration, updateStudentDocument, 
-    deadlines, isSubmissionLocked, showToast 
+    deadlines, isSubmissionLocked, formatDeadline, showToast 
   } = useApp();
 
   const [activeTab, setActiveTab] = useState(currentStudent?.phase || 1);
@@ -68,7 +68,7 @@ export const StudentDashboard = () => {
           </div>
           <div className="text-[11px] text-blue-200 mt-2 flex items-center gap-1">
             <Calendar size={12} />
-            <span>Registration Cut-off: <strong>{deadlines.phase1_registration?.date}</strong></span>
+            <span>Registration Cut-off: <strong>{formatDeadline(deadlines.phase1_registration?.date, deadlines.phase1_registration?.time)}</strong></span>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@ export const StudentDashboard = () => {
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500 font-semibold">Cut-off Deadline:</span>
                 <span className="font-bold bg-slate-100 px-2.5 py-1 rounded-md text-slate-800 font-mono">
-                  {deadlines.phase1_registration?.date}
+                  {formatDeadline(deadlines.phase1_registration?.date, deadlines.phase1_registration?.time)}
                 </span>
                 {lockPhase1 && (
                   <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">🔒 Locked</span>
@@ -290,7 +290,7 @@ export const StudentDashboard = () => {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 1</span>
                 <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{deadlines.phase3_offer?.date}</strong>
+                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}</strong>
                 </span>
               </div>
               
@@ -305,7 +305,7 @@ export const StudentDashboard = () => {
 
               {lockOffer && (
                 <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
-                  <Lock size={14} /> Cut-off deadline has passed. Upload locked by coordinator.
+                  <Lock size={14} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}). Upload locked by coordinator.
                 </div>
               )}
             </div>
@@ -326,7 +326,7 @@ export const StudentDashboard = () => {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-[#003DA5] bg-blue-50 px-2.5 py-1 rounded-full">Phase 3 · Step 2</span>
                 <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{deadlines.phase3_duty?.date}</strong>
+                  <Calendar size={12} /> Cut-off: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}</strong>
                 </span>
               </div>
 
@@ -341,7 +341,7 @@ export const StudentDashboard = () => {
 
               {lockDuty && (
                 <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600 font-bold flex items-center gap-1.5">
-                  <Lock size={14} /> Cut-off deadline has passed. Upload locked by coordinator.
+                  <Lock size={14} /> Cut-off deadline has passed ({formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}). Upload locked by coordinator.
                 </div>
               )}
             </div>
@@ -411,7 +411,7 @@ export const StudentDashboard = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[11px] font-bold text-slate-400">Section A (20 Marks)</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">{deadlines.phase4_logbook?.date}</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)}</span>
                 </div>
                 <h4 className="font-bold text-sm text-slate-800 mt-1">Completed Logbook</h4>
                 <p className="text-xs text-slate-500 mt-1">12-week verified daily reflection entries.</p>
@@ -419,7 +419,7 @@ export const StudentDashboard = () => {
                   <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.logbook}</p>
                 )}
                 {lockLogbook && (
-                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed)</div>
+                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)})</div>
                 )}
               </div>
               <button 
@@ -436,7 +436,7 @@ export const StudentDashboard = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[11px] font-bold text-slate-400">Section B (60 Marks)</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">{deadlines.phase4_report?.date}</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)}</span>
                 </div>
                 <h4 className="font-bold text-sm text-slate-800 mt-1">Final Internship Report</h4>
                 <p className="text-xs text-slate-500 mt-1">Chapters 1 to 5 with executive summary.</p>
@@ -444,7 +444,7 @@ export const StudentDashboard = () => {
                   <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.finalReport}</p>
                 )}
                 {lockReport && (
-                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed)</div>
+                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)})</div>
                 )}
               </div>
               <button 
@@ -461,7 +461,7 @@ export const StudentDashboard = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[11px] font-bold text-slate-400">Section C (20 Marks)</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">{deadlines.phase4_evaluation?.date}</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">{formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)}</span>
                 </div>
                 <h4 className="font-bold text-sm text-slate-800 mt-1">Supervisor Evaluation</h4>
                 <p className="text-xs text-slate-500 mt-1">Industry conduct assessment rubric.</p>
@@ -469,7 +469,7 @@ export const StudentDashboard = () => {
                   <p className="mt-3 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.supervisorEvaluation}</p>
                 )}
                 {lockEval && (
-                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed)</div>
+                  <div className="mt-2 text-[11px] text-red-600 font-bold">🔒 Locked (Cut-off passed: {formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)})</div>
                 )}
               </div>
               <button 
