@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { INITIAL_STUDENTS } from '../data/mockData';
 
 const AppContext = createContext();
@@ -244,6 +244,75 @@ export const AppProvider = ({ children }) => {
     showToast(`Final grade of ${total}% recorded for student.`, 'success');
   };
 
+  const importStudents = (importedList) => {
+    if (!Array.isArray(importedList) || importedList.length === 0) return { addedCount: 0, updatedCount: 0 };
+    
+    let addedCount = 0;
+    let updatedCount = 0;
+
+    setStudents(prev => {
+      const studentMap = new Map(prev.map(s => [s.id.toLowerCase(), s]));
+
+      importedList.forEach(item => {
+        if (!item.id || !item.name) return;
+
+        const key = item.id.trim().toLowerCase();
+        const existing = studentMap.get(key);
+        const financeCleared = item.financeCleared === true || String(item.financeCleared).toLowerCase() === 'true' || item.financeCleared === 1 || String(item.financeCleared).toLowerCase() === 'yes';
+        const facultyApproved = item.facultyApproved === true || String(item.facultyApproved).toLowerCase() === 'true' || item.facultyApproved === 1 || String(item.facultyApproved).toLowerCase() === 'yes';
+        const bothCleared = financeCleared && facultyApproved;
+        const phase = Number(item.phase) || (bothCleared ? 2 : 1);
+
+        const newStudent = {
+          id: item.id.trim(),
+          name: item.name.trim(),
+          program: (item.program || existing?.program || 'DHRM').toUpperCase().trim(),
+          cgpa: parseFloat(item.cgpa) || existing?.cgpa || 3.00,
+          credits: parseInt(item.credits, 10) || existing?.credits || 60,
+          company: item.company?.trim() || existing?.company || 'Pending Placement',
+          lecturer: item.lecturer?.trim() || existing?.lecturer || 'Dr. Rahman',
+          financeCleared,
+          facultyApproved,
+          phase1Submitted: true,
+          phase: phase,
+          stages: existing ? existing.stages : [1, bothCleared ? 1 : 0, 0, 0],
+          marks: item.marks ? Number(item.marks) : (existing ? existing.marks : null),
+          rubricScores: existing ? existing.rubricScores : null,
+          feedback: existing ? existing.feedback : null,
+          registrationData: existing?.registrationData || {
+            icPassport: item.icPassport || '',
+            phone: item.phone || '',
+            email: item.email || `${item.name.toLowerCase().replace(/[^a-z0-9]+/g, '.')}@student.mahsa.edu.my`,
+            preferredIndustry: item.preferredIndustry || 'Human Resources & Administration',
+            preferredLocation: item.preferredLocation || 'Kuala Lumpur / Selangor',
+            emergencyContact: ''
+          },
+          documents: existing?.documents || {
+            salDownloaded: bothCleared,
+            offerLetter: item.offerLetter || null,
+            reportDuty: item.reportDuty || null,
+            logbook: null,
+            finalReport: null,
+            supervisorEvaluation: null
+          }
+        };
+
+        if (existing) {
+          updatedCount++;
+        } else {
+          addedCount++;
+        }
+        studentMap.set(key, newStudent);
+      });
+
+      return Array.from(studentMap.values());
+    });
+
+    const msg = `CSV Import completed: ${addedCount} added, ${updatedCount} updated.`;
+    showToast(msg, 'success');
+    return { addedCount, updatedCount };
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -269,7 +338,8 @@ export const AppProvider = ({ children }) => {
         approveBothClearances,
         submitPhase1Registration,
         updateStudentDocument,
-        submitStudentMarks
+        submitStudentMarks,
+        importStudents
       }}
     >
       {children}

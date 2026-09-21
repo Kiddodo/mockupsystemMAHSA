@@ -5,6 +5,7 @@ import {
   Lock, Unlock, Search, ShieldCheck, Mail, FolderOpen, AlertCircle,
   Calendar, Check, SlidersHorizontal, ShieldAlert
 } from 'lucide-react';
+import { ImportStudentModal } from './ImportStudentModal';
 
 export const CoordinatorDashboard = () => {
   const { 
@@ -18,6 +19,7 @@ export const CoordinatorDashboard = () => {
   const [filterClearance, setFilterClearance] = useState('ALL');
   const [selectedFolderStudent, setSelectedFolderStudent] = useState(null);
   const [emailModalStudent, setEmailModalStudent] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [deadlineTab, setDeadlineTab] = useState('ALL'); // ALL, PHASE1, PHASE3, PHASE4
 
   // Statistics
@@ -61,7 +63,7 @@ export const CoordinatorDashboard = () => {
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => showToast('Student list imported from CSV (12 records synced).', 'success')}
+            onClick={() => setShowImportModal(true)}
             className="px-3 py-1.5 bg-[#003DA5] hover:bg-[#002d7a] text-white text-sm font-semibold rounded flex items-center gap-1.5 transition"
           >
             <FileSpreadsheet size={15} />
@@ -455,6 +457,12 @@ export const CoordinatorDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Import Student CSV Modal */}
+      <ImportStudentModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+      />
     </div>
   );
 };
