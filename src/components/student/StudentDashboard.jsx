@@ -49,15 +49,15 @@ export const StudentDashboard = () => {
             <span>Program: <strong className="text-slate-800 font-semibold">{currentStudent?.program}</strong></span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{currentStudent?.name}</h1>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-sm text-slate-600 mt-1">
             Academic Supervisor: <strong className="text-slate-800">{currentStudent?.lecturer}</strong> · Host Company: <strong className="text-slate-800">{currentStudent?.company}</strong>
           </p>
         </div>
 
         <div className="bg-slate-50 border border-slate-200 rounded-md p-3 min-w-[240px]">
-          <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Internship Progress</div>
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Internship Progress</div>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-bold text-slate-800">
+            <span className="text-base font-bold text-slate-800">
               {currentStudent?.marks ? 'Phase 4 (Graded)' : `Phase ${currentStudent?.phase} Active`}
             </span>
             <span className={`text-xs px-2 py-0.5 rounded font-medium ${
@@ -66,8 +66,8 @@ export const StudentDashboard = () => {
               {isPhase2Unlocked ? 'Clearances Approved' : 'Clearances Pending'}
             </span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
-            <Calendar size={12} />
+          <div className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+            <Calendar size={13} />
             <span>Registration Cut-off: <strong>{formatDeadline(deadlines.phase1_registration?.date, deadlines.phase1_registration?.time)}</strong></span>
           </div>
         </div>
@@ -82,10 +82,10 @@ export const StudentDashboard = () => {
           }`}
         >
           <div>
-            <div className={`text-[11px] font-semibold uppercase tracking-wide ${activeTab === 1 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 1</div>
+            <div className={`text-xs font-semibold uppercase tracking-wide ${activeTab === 1 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 1</div>
             <div className="font-bold text-sm mt-0.5">Registration & Clearances</div>
           </div>
-          {currentStudent?.financeCleared && currentStudent?.facultyApproved ? <CheckCircle2 size={16} className="text-emerald-400" /> : <Clock size={15} />}
+          {currentStudent?.financeCleared && currentStudent?.facultyApproved ? <CheckCircle2 size={16} className="text-emerald-400" /> : <Clock size={16} />}
         </button>
 
         <button
@@ -95,10 +95,10 @@ export const StudentDashboard = () => {
           }`}
         >
           <div>
-            <div className={`text-[11px] font-semibold uppercase tracking-wide ${activeTab === 2 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 2</div>
+            <div className={`text-xs font-semibold uppercase tracking-wide ${activeTab === 2 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 2</div>
             <div className="font-bold text-sm mt-0.5">Official Letters & Kit</div>
           </div>
-          {isPhase2Unlocked ? <CheckCircle2 size={16} className="text-emerald-400" /> : <Lock size={15} className="text-amber-500" />}
+          {isPhase2Unlocked ? <CheckCircle2 size={16} className="text-emerald-400" /> : <Lock size={16} className="text-amber-500" />}
         </button>
 
         <button
@@ -108,15 +108,15 @@ export const StudentDashboard = () => {
           }`}
         >
           <div>
-            <div className={`text-[11px] font-semibold uppercase tracking-wide ${activeTab === 3 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 3</div>
+            <div className={`text-xs font-semibold uppercase tracking-wide ${activeTab === 3 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 3</div>
             <div className="font-bold text-sm mt-0.5">Offer & Report Duty</div>
           </div>
           {!isPhase2Unlocked ? (
-            <Lock size={15} className="text-amber-500" />
+            <Lock size={16} className="text-amber-500" />
           ) : currentStudent?.documents?.offerLetter ? (
             <CheckCircle2 size={16} className="text-emerald-400" />
           ) : (
-            <Clock size={15} />
+            <Clock size={16} />
           )}
         </button>
 
@@ -127,15 +127,15 @@ export const StudentDashboard = () => {
           }`}
         >
           <div>
-            <div className={`text-[11px] font-semibold uppercase tracking-wide ${activeTab === 4 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 4</div>
+            <div className={`text-xs font-semibold uppercase tracking-wide ${activeTab === 4 ? 'text-blue-100' : 'text-slate-400'}`}>Phase 4</div>
             <div className="font-bold text-sm mt-0.5">Submissions & Grading</div>
           </div>
           {!isPhase2Unlocked ? (
-            <Lock size={15} className="text-amber-500" />
+            <Lock size={16} className="text-amber-500" />
           ) : currentStudent?.marks ? (
             <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded">{currentStudent.marks}%</span>
           ) : (
-            <Clock size={15} />
+            <Clock size={16} />
           )}
         </button>
       </div>
@@ -147,9 +147,9 @@ export const StudentDashboard = () => {
             <div className={`p-4 rounded-lg border ${currentStudent?.financeCleared ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'}`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Department Clearance 1</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Department Clearance 1</span>
                   <h3 className="font-bold text-base text-slate-800 mt-0.5">Finance & Bursary Clearance</h3>
-                  <p className="text-xs text-slate-600 mt-1">Verifies tuition fee status and zero outstanding balance.</p>
+                  <p className="text-sm text-slate-600 mt-1">Verifies tuition fee status and zero outstanding balance.</p>
                 </div>
                 <span className={`px-2.5 py-0.5 rounded text-xs font-semibold ${currentStudent?.financeCleared ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
                   {currentStudent?.financeCleared ? 'Cleared' : 'Pending Review'}
@@ -160,9 +160,9 @@ export const StudentDashboard = () => {
             <div className={`p-4 rounded-lg border ${currentStudent?.facultyApproved ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'}`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Department Clearance 2</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Department Clearance 2</span>
                   <h3 className="font-bold text-base text-slate-800 mt-0.5">Faculty Academic Eligibility</h3>
-                  <p className="text-xs text-slate-600 mt-1">CGPA: {currentStudent?.cgpa} (≥2.00) · Credits: {currentStudent?.credits} (≥60).</p>
+                  <p className="text-sm text-slate-600 mt-1">CGPA: {currentStudent?.cgpa} (≥2.00) · Credits: {currentStudent?.credits} (≥60).</p>
                 </div>
                 <span className={`px-2.5 py-0.5 rounded text-xs font-semibold ${currentStudent?.facultyApproved ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
                   {currentStudent?.facultyApproved ? 'Approved' : 'Pending Review'}
@@ -175,9 +175,9 @@ export const StudentDashboard = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
               <div>
                 <h3 className="font-bold text-base text-slate-800">Registration & Re-enrolment for Internship Form</h3>
-                <p className="text-xs text-slate-500">Review student particulars and submit for departmental endorsement.</p>
+                <p className="text-sm text-slate-500">Review student particulars and submit for departmental endorsement.</p>
               </div>
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-sm">
                 <span className="text-slate-500 font-medium">Cut-off Deadline:</span>
                 <span className="font-semibold bg-slate-100 px-2 py-0.5 rounded text-slate-800 font-mono text-xs border border-slate-200">
                   {formatDeadline(deadlines.phase1_registration?.date, deadlines.phase1_registration?.time)}
@@ -191,28 +191,28 @@ export const StudentDashboard = () => {
             <form onSubmit={handlePhase1Submit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
-                  <input type="text" disabled value={currentStudent?.name} className="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-semibold text-slate-800" />
+                  <label className="block text-sm font-semibold text-slate-600 mb-1">Full Name</label>
+                  <input type="text" disabled value={currentStudent?.name} className="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-800" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Matric ID</label>
-                  <input type="text" disabled value={currentStudent?.id} className="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-semibold text-slate-800" />
+                  <label className="block text-sm font-semibold text-slate-600 mb-1">Matric ID</label>
+                  <input type="text" disabled value={currentStudent?.id} className="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-800" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">IC / Passport Number</label>
-                  <input type="text" disabled={lockPhase1} value={formData.icPassport} onChange={e => setFormData({...formData, icPassport: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-xs disabled:bg-slate-100 text-slate-800" />
+                  <label className="block text-sm font-semibold text-slate-600 mb-1">IC / Passport Number</label>
+                  <input type="text" disabled={lockPhase1} value={formData.icPassport} onChange={e => setFormData({...formData, icPassport: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-sm disabled:bg-slate-100 text-slate-800" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Contact Phone</label>
-                  <input type="text" disabled={lockPhase1} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-xs disabled:bg-slate-100 text-slate-800" />
+                  <label className="block text-sm font-semibold text-slate-600 mb-1">Contact Phone</label>
+                  <input type="text" disabled={lockPhase1} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-sm disabled:bg-slate-100 text-slate-800" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Preferred Industry</label>
-                  <input type="text" disabled={lockPhase1} value={formData.preferredIndustry} onChange={e => setFormData({...formData, preferredIndustry: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-xs disabled:bg-slate-100 text-slate-800" />
+                  <label className="block text-sm font-semibold text-slate-600 mb-1">Preferred Industry</label>
+                  <input type="text" disabled={lockPhase1} value={formData.preferredIndustry} onChange={e => setFormData({...formData, preferredIndustry: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-sm disabled:bg-slate-100 text-slate-800" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Target Location</label>
-                  <input type="text" disabled={lockPhase1} value={formData.preferredLocation} onChange={e => setFormData({...formData, preferredLocation: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-xs disabled:bg-slate-100 text-slate-800" />
+                  <label className="block text-sm font-semibold text-slate-600 mb-1">Target Location</label>
+                  <input type="text" disabled={lockPhase1} value={formData.preferredLocation} onChange={e => setFormData({...formData, preferredLocation: e.target.value})} className="w-full p-2 border border-slate-300 rounded text-sm disabled:bg-slate-100 text-slate-800" />
                 </div>
               </div>
 
@@ -220,9 +220,9 @@ export const StudentDashboard = () => {
                 <button 
                   type="submit" 
                   disabled={lockPhase1}
-                  className="bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-xs px-5 py-2 rounded flex items-center gap-1.5 transition"
+                  className="bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-sm px-5 py-2 rounded flex items-center gap-1.5 transition"
                 >
-                  <Check size={14} /> 
+                  <Check size={16} /> 
                   <span>{lockPhase1 ? 'Submissions Closed' : 'Save & Submit Registration'}</span>
                 </button>
               </div>
@@ -238,8 +238,8 @@ export const StudentDashboard = () => {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center max-w-lg mx-auto my-8">
               <Lock size={28} className="text-amber-600 mx-auto mb-2" />
               <h3 className="font-bold text-base text-slate-800 mb-1">Phase 2 Currently Gated</h3>
-              <p className="text-xs text-slate-600 mb-3">Awaiting Finance (Bursary) and Faculty clearances before releasing the official SAL and document templates.</p>
-              <div className="text-[11px] font-medium text-slate-500">Note: Approvals can be granted by the Coordinator or tested via the top bar.</div>
+              <p className="text-sm text-slate-600 mb-3">Awaiting Finance (Bursary) and Faculty clearances before releasing the official SAL and document templates.</p>
+              <div className="text-xs font-medium text-slate-500">Note: Approvals can be granted by the Coordinator or tested via the top bar.</div>
             </div>
           ) : (
             <div className="space-y-6">
@@ -250,15 +250,15 @@ export const StudentDashboard = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-base text-slate-800">Student Application Letter (SAL)</h3>
-                    <p className="text-xs text-slate-600 mt-0.5">Official endorsement letter from MAHSA Faculty of Business with your student credentials.</p>
+                    <p className="text-sm text-slate-600 mt-0.5">Official endorsement letter from MAHSA Faculty of Business with your student credentials.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setShowSalModal(true)} className="bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 transition">
-                    <Eye size={13} /> View Letter
+                  <button onClick={() => setShowSalModal(true)} className="bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold text-sm px-3.5 py-1.5 rounded flex items-center gap-1.5 transition">
+                    <Eye size={15} /> Preview SAL
                   </button>
-                  <button onClick={() => showToast('SAL PDF Downloaded.', 'success')} className="bg-white hover:bg-slate-50 border border-slate-300 font-semibold text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 transition text-slate-700">
-                    <Download size={13} /> Download PDF
+                  <button onClick={() => showToast('SAL PDF Downloaded.', 'success')} className="bg-white hover:bg-slate-50 border border-slate-300 font-semibold text-sm px-3.5 py-1.5 rounded flex items-center gap-1.5 transition text-slate-700">
+                    <Download size={15} /> Download PDF
                   </button>
                 </div>
               </div>
@@ -277,12 +277,12 @@ export const StudentDashboard = () => {
                   ].map((item, idx) => (
                     <div key={idx} className="p-3.5 rounded border border-slate-200 bg-slate-50/50 flex flex-col justify-between">
                       <div>
-                        <div className="text-[11px] text-[#003DA5] font-semibold mb-1">Document #{idx+1}</div>
-                        <div className="font-bold text-xs text-slate-800">{item.title}</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">{item.desc}</div>
+                        <div className="text-xs text-[#003DA5] font-semibold mb-1">Document #{idx+1}</div>
+                        <div className="font-bold text-sm text-slate-800">{item.title}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{item.desc}</div>
                       </div>
-                      <button onClick={() => showToast(`${item.title} downloaded.`, 'info')} className="mt-3 text-xs font-semibold text-[#003DA5] flex items-center gap-1">
-                        <Download size={12} /> Download
+                      <button onClick={() => showToast(`${item.title} downloaded.`, 'info')} className="mt-3 text-sm font-semibold text-[#003DA5] flex items-center gap-1">
+                        <Download size={14} /> Download
                       </button>
                     </div>
                   ))}
@@ -300,8 +300,8 @@ export const StudentDashboard = () => {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center max-w-lg mx-auto my-8">
               <Lock size={28} className="text-amber-600 mx-auto mb-2" />
               <h3 className="font-bold text-base text-slate-800 mb-1">Phase 3 Currently Gated</h3>
-              <p className="text-xs text-slate-600 mb-3">You must obtain Finance (Bursary) and Faculty approvals in Phase 1 and receive your official SAL before submitting company offer letters or reporting duty.</p>
-              <div className="text-[11px] font-medium text-slate-500">Note: Approvals can be granted by the Coordinator or tested via the top bar.</div>
+              <p className="text-sm text-slate-600 mb-3">You must obtain Finance (Bursary) and Faculty approvals in Phase 1 and receive your official SAL before submitting company offer letters or reporting duty.</p>
+              <div className="text-xs font-medium text-slate-500">Note: Approvals can be granted by the Coordinator or tested via the top bar.</div>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-4">
@@ -310,22 +310,22 @@ export const StudentDashboard = () => {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-[#003DA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Step 1: Offer Letter</span>
-                    <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                      <Calendar size={12} /> Deadline: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}</strong>
+                    <span className="text-sm text-slate-500 font-medium flex items-center gap-1">
+                      <Calendar size={13} /> Deadline: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}</strong>
                     </span>
                   </div>
                   
-                  <h4 className="font-bold text-sm text-slate-800 mt-1">Company Offer Letter</h4>
-                  <p className="text-xs text-slate-500 mt-0.5">Official acceptance letter with internship allowance and tenure.</p>
+                  <h4 className="font-bold text-base text-slate-800 mt-1">Company Offer Letter</h4>
+                  <p className="text-sm text-slate-500 mt-0.5">Official acceptance letter with internship allowance and tenure.</p>
                   
                   {currentStudent?.documents?.offerLetter && (
-                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-xs font-medium text-slate-700 flex items-center gap-2">
-                      <FileText size={15} className="text-[#003DA5]" /> {currentStudent.documents.offerLetter}
+                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-sm font-medium text-slate-700 flex items-center gap-2">
+                      <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.offerLetter}
                     </div>
                   )}
 
                   {lockOffer && (
-                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium">
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700 font-medium">
                       Cut-off deadline has passed ({formatDeadline(deadlines.phase3_offer?.date, deadlines.phase3_offer?.time)}). Upload locked.
                     </div>
                   )}
@@ -334,9 +334,9 @@ export const StudentDashboard = () => {
                 <button
                   disabled={lockOffer}
                   onClick={() => updateStudentDocument(currentStudent.id, 'offerLetter', 'OfferLetter_GrandHyatt.pdf', 3)}
-                  className="mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-xs rounded flex items-center justify-center gap-1.5 transition"
+                  className="mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-sm rounded flex items-center justify-center gap-1.5 transition"
                 >
-                  <Upload size={13} /> 
+                  <Upload size={14} /> 
                   <span>{lockOffer ? 'Uploads Closed' : currentStudent?.documents?.offerLetter ? 'Replace Offer Letter' : 'Upload Offer Letter'}</span>
                 </button>
               </div>
@@ -346,22 +346,22 @@ export const StudentDashboard = () => {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-[#003DA5] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Step 2: Report Duty</span>
-                    <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                      <Calendar size={12} /> Deadline: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}</strong>
+                    <span className="text-sm text-slate-500 font-medium flex items-center gap-1">
+                      <Calendar size={13} /> Deadline: <strong className="text-slate-700">{formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}</strong>
                     </span>
                   </div>
 
-                  <h4 className="font-bold text-sm text-slate-800 mt-1">Endorsed Report Duty Form</h4>
-                  <p className="text-xs text-slate-500 mt-0.5">Signed by company supervisor confirming reporting date.</p>
+                  <h4 className="font-bold text-base text-slate-800 mt-1">Endorsed Report Duty Form</h4>
+                  <p className="text-sm text-slate-500 mt-0.5">Signed by company supervisor confirming reporting date.</p>
                   
                   {currentStudent?.documents?.reportDuty && (
-                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-xs font-medium text-slate-700 flex items-center gap-2">
-                      <FileText size={15} className="text-[#003DA5]" /> {currentStudent.documents.reportDuty}
+                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-sm font-medium text-slate-700 flex items-center gap-2">
+                      <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.reportDuty}
                     </div>
                   )}
 
                   {lockDuty && (
-                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium">
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700 font-medium">
                       Cut-off deadline has passed ({formatDeadline(deadlines.phase3_duty?.date, deadlines.phase3_duty?.time)}). Upload locked.
                     </div>
                   )}
@@ -370,9 +370,9 @@ export const StudentDashboard = () => {
                 <button
                   disabled={lockDuty}
                   onClick={() => updateStudentDocument(currentStudent.id, 'reportDuty', 'ReportDuty_Signed.pdf', 4)}
-                  className="mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-xs rounded flex items-center justify-center gap-1.5 transition"
+                  className="mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-sm rounded flex items-center justify-center gap-1.5 transition"
                 >
-                  <Upload size={13} /> 
+                  <Upload size={14} /> 
                   <span>{lockDuty ? 'Uploads Closed' : currentStudent?.documents?.reportDuty ? 'Replace Report Duty Form' : 'Upload Report Duty Form'}</span>
                 </button>
               </div>
@@ -388,8 +388,8 @@ export const StudentDashboard = () => {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center max-w-lg mx-auto my-8">
               <Lock size={28} className="text-amber-600 mx-auto mb-2" />
               <h3 className="font-bold text-base text-slate-800 mb-1">Phase 4 Currently Gated</h3>
-              <p className="text-xs text-slate-600 mb-3">Internship submissions and grading rubrics are locked until prerequisite Phase 1 clearances (Bursary & Faculty) and official documents are issued.</p>
-              <div className="text-[11px] font-medium text-slate-500">Note: Approvals can be granted by the Coordinator or tested via the top bar.</div>
+              <p className="text-sm text-slate-600 mb-3">Internship submissions and grading rubrics are locked until prerequisite Phase 1 clearances (Bursary & Faculty) and official documents are issued.</p>
+              <div className="text-xs font-medium text-slate-500">Note: Approvals can be granted by the Coordinator or tested via the top bar.</div>
             </div>
           ) : (
             <div className="space-y-5">
@@ -398,7 +398,7 @@ export const StudentDashboard = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/70 pb-3">
                     <div>
                       <h3 className="text-lg font-bold text-slate-800">Final Grade Recorded: {currentStudent.marks}%</h3>
-                      <p className="text-xs text-slate-600 mt-0.5">Evaluated by: <strong>{currentStudent.lecturer}</strong></p>
+                      <p className="text-sm text-slate-600 mt-0.5">Evaluated by: <strong>{currentStudent.lecturer}</strong></p>
                     </div>
                     {currentStudent.recommendation && (
                       <span className="bg-white text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded border border-emerald-300 self-start sm:self-auto">
@@ -408,7 +408,7 @@ export const StudentDashboard = () => {
                   </div>
 
                   {/* Section Explanations Grid */}
-                  <div className="grid md:grid-cols-3 gap-3 text-xs">
+                  <div className="grid md:grid-cols-3 gap-3 text-sm">
                     <div className="bg-white p-3 rounded border border-emerald-200">
                       <div className="font-semibold text-slate-800 mb-1">Section A (Logbook) Remarks:</div>
                       <p className="text-slate-600 text-xs leading-relaxed">
@@ -430,7 +430,7 @@ export const StudentDashboard = () => {
                   </div>
 
                   {currentStudent.feedback && (
-                    <div className="bg-white p-3 rounded border border-emerald-200 text-xs text-slate-700">
+                    <div className="bg-white p-3 rounded border border-emerald-200 text-sm text-slate-700">
                       <strong className="font-semibold text-slate-800">Supervisor Commendation:</strong> {currentStudent.feedback}
                     </div>
                   )}
@@ -442,16 +442,16 @@ export const StudentDashboard = () => {
                 <div className="bg-white rounded-lg border border-slate-200 p-5 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-semibold text-slate-500">Section A (20 Marks)</span>
-                      <span className="text-[11px] text-slate-500 font-mono">{formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)}</span>
+                      <span className="text-xs font-semibold text-slate-500">Section A (20 Marks)</span>
+                      <span className="text-xs text-slate-500 font-mono">{formatDeadline(deadlines.phase4_logbook?.date, deadlines.phase4_logbook?.time)}</span>
                     </div>
-                    <h4 className="font-bold text-sm text-slate-800">Completed Logbook</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">12-week verified daily reflection entries.</p>
+                    <h4 className="font-bold text-base text-slate-800">Completed Logbook</h4>
+                    <p className="text-sm text-slate-500 mt-0.5">12-week verified daily reflection entries.</p>
                     {currentStudent?.documents?.logbook && (
                       <p className="mt-2.5 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.logbook}</p>
                     )}
                     {lockLogbook && (
-                      <div className="mt-2 text-[11px] text-red-600 font-medium">Locked (Cut-off passed)</div>
+                      <div className="mt-2 text-xs text-red-600 font-medium">Locked (Cut-off passed)</div>
                     )}
                   </div>
                   <button 
@@ -467,16 +467,16 @@ export const StudentDashboard = () => {
                 <div className="bg-white rounded-lg border border-slate-200 p-5 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-semibold text-slate-500">Section B (60 Marks)</span>
-                      <span className="text-[11px] text-slate-500 font-mono">{formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)}</span>
+                      <span className="text-xs font-semibold text-slate-500">Section B (60 Marks)</span>
+                      <span className="text-xs text-slate-500 font-mono">{formatDeadline(deadlines.phase4_report?.date, deadlines.phase4_report?.time)}</span>
                     </div>
-                    <h4 className="font-bold text-sm text-slate-800">Final Internship Report</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">Chapters 1 to 5 with executive summary.</p>
+                    <h4 className="font-bold text-base text-slate-800">Final Internship Report</h4>
+                    <p className="text-sm text-slate-500 mt-0.5">Chapters 1 to 5 with executive summary.</p>
                     {currentStudent?.documents?.finalReport && (
                       <p className="mt-2.5 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.finalReport}</p>
                     )}
                     {lockReport && (
-                      <div className="mt-2 text-[11px] text-red-600 font-medium">Locked (Cut-off passed)</div>
+                      <div className="mt-2 text-xs text-red-600 font-medium">Locked (Cut-off passed)</div>
                     )}
                   </div>
                   <button 
@@ -492,16 +492,16 @@ export const StudentDashboard = () => {
                 <div className="bg-white rounded-lg border border-slate-200 p-5 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-semibold text-slate-500">Section C (20 Marks)</span>
-                      <span className="text-[11px] text-slate-500 font-mono">{formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)}</span>
+                      <span className="text-xs font-semibold text-slate-500">Section C (20 Marks)</span>
+                      <span className="text-xs text-slate-500 font-mono">{formatDeadline(deadlines.phase4_evaluation?.date, deadlines.phase4_evaluation?.time)}</span>
                     </div>
-                    <h4 className="font-bold text-sm text-slate-800">Supervisor Evaluation</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">Industry conduct assessment rubric.</p>
+                    <h4 className="font-bold text-base text-slate-800">Supervisor Evaluation</h4>
+                    <p className="text-sm text-slate-500 mt-0.5">Industry conduct assessment rubric.</p>
                     {currentStudent?.documents?.supervisorEvaluation && (
                       <p className="mt-2.5 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.supervisorEvaluation}</p>
                     )}
                     {lockEval && (
-                      <div className="mt-2 text-[11px] text-red-600 font-medium">Locked (Cut-off passed)</div>
+                      <div className="mt-2 text-xs text-red-600 font-medium">Locked (Cut-off passed)</div>
                     )}
                   </div>
                   <button 

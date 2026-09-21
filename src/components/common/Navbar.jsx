@@ -32,11 +32,11 @@ export const Navbar = () => {
               M
             </div>
             <div>
-              <div className="font-bold text-sm tracking-normal flex items-center gap-2">
+              <div className="font-bold text-base tracking-normal flex items-center gap-2">
                 MAHSA University
                 {getRoleBadge()}
               </div>
-              <p className="text-[11px] text-blue-200">Internship Management System</p>
+              <p className="text-xs text-blue-200">Internship Management System</p>
             </div>
           </div>
 
@@ -82,8 +82,8 @@ export const Navbar = () => {
             {/* User Profile & Logout */}
             <div className="flex items-center space-x-3 border-l border-blue-400/30 pl-3">
               <div className="text-right hidden sm:block">
-                <div className="text-xs font-semibold leading-tight">{currentUser?.name}</div>
-                <div className="text-[11px] text-blue-200">{currentUser?.email}</div>
+                <div className="text-sm font-semibold leading-tight">{currentUser?.name}</div>
+                <div className="text-xs text-blue-200">{currentUser?.email}</div>
               </div>
               <button
                 onClick={handleLogout}

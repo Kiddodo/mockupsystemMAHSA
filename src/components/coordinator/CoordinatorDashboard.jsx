@@ -53,7 +53,7 @@ export const CoordinatorDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-200 gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Coordinator Administration</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 mt-0.5">
             Active Session: <strong className="text-slate-700">{session}</strong> · Individual Submission Gating & Clearances
           </p>
         </div>
@@ -62,16 +62,16 @@ export const CoordinatorDashboard = () => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => showToast('Student list imported from CSV (12 records synced).', 'success')}
-            className="px-3 py-1.5 bg-[#003DA5] hover:bg-[#002d7a] text-white text-xs font-semibold rounded flex items-center gap-1.5 transition"
+            className="px-3 py-1.5 bg-[#003DA5] hover:bg-[#002d7a] text-white text-sm font-semibold rounded flex items-center gap-1.5 transition"
           >
-            <FileSpreadsheet size={14} />
+            <FileSpreadsheet size={15} />
             <span>Import Student CSV</span>
           </button>
           <button
             onClick={() => showToast('Faculty templates uploaded to SharePoint repository.', 'info')}
-            className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded flex items-center gap-1.5 transition"
+            className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-semibold rounded flex items-center gap-1.5 transition"
           >
-            <Upload size={14} />
+            <Upload size={15} />
             <span>Upload Templates</span>
           </button>
         </div>
@@ -81,46 +81,46 @@ export const CoordinatorDashboard = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 my-5">
         <div className="bg-white p-4 rounded-lg border border-slate-200">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Total Enrolled</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Enrolled</span>
             <div className="w-7 h-7 bg-blue-50 text-[#003DA5] rounded flex items-center justify-center font-bold">
-              <Users size={15} />
+              <Users size={16} />
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-900 mt-2">{totalStudents}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Active candidates</div>
+          <div className="text-xs text-slate-500 mt-0.5">Active candidates</div>
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Fully Cleared</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Fully Cleared</span>
             <div className="w-7 h-7 bg-emerald-50 text-emerald-600 rounded flex items-center justify-center font-bold">
-              <CheckCircle size={15} />
+              <CheckCircle size={16} />
             </div>
           </div>
           <div className="text-2xl font-bold text-emerald-700 mt-2">{fullyCleared}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Bursary & Faculty endorsed</div>
+          <div className="text-xs text-slate-500 mt-0.5">Bursary & Faculty endorsed</div>
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Bursary Holds</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Bursary Holds</span>
             <div className="w-7 h-7 bg-amber-50 text-amber-600 rounded flex items-center justify-center font-bold">
-              <Clock size={15} />
+              <Clock size={16} />
             </div>
           </div>
           <div className="text-2xl font-bold text-amber-700 mt-2">{pendingFinance}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Pending fee clearance</div>
+          <div className="text-xs text-slate-500 mt-0.5">Pending fee clearance</div>
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Faculty Holds</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Faculty Holds</span>
             <div className="w-7 h-7 bg-slate-100 text-slate-700 rounded flex items-center justify-center font-bold">
-              <Clock size={15} />
+              <Clock size={16} />
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-700 mt-2">{pendingFaculty}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Pending credit verification</div>
+          <div className="text-xs text-slate-500 mt-0.5">Pending credit verification</div>
         </div>
       </div>
 
@@ -129,10 +129,10 @@ export const CoordinatorDashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between pb-3.5 border-b border-slate-100 gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <SlidersHorizontal size={16} className="text-[#003DA5]" />
-              <h3 className="font-bold text-sm text-slate-800">Submission Cut-offs & Auto-Lock Settings</h3>
+              <SlidersHorizontal size={18} className="text-[#003DA5]" />
+              <h3 className="font-bold text-base text-slate-800">Submission Cut-offs & Auto-Lock Settings</h3>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-sm text-slate-500 mt-0.5">
               Set cut-off dates, times, and automated lockouts for each phase independently.
             </p>
           </div>
@@ -141,13 +141,13 @@ export const CoordinatorDashboard = () => {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setAllAutoLocks(true)}
-              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded transition"
+              className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded transition"
             >
               Arm All Auto-Locks
             </button>
             <button
               onClick={() => setAllAutoLocks(false)}
-              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded transition"
+              className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded transition"
             >
               Disable All Auto-Locks
             </button>
@@ -165,7 +165,7 @@ export const CoordinatorDashboard = () => {
             <button
               key={tab.id}
               onClick={() => setDeadlineTab(tab.id)}
-              className={`px-2.5 py-1 text-xs font-medium rounded transition ${
+              className={`px-3 py-1 text-sm font-medium rounded transition ${
                 deadlineTab === tab.id 
                   ? 'bg-[#003DA5] text-white' 
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -191,11 +191,11 @@ export const CoordinatorDashboard = () => {
               >
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
+                    <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
                       Phase {item.phase}
                     </span>
                     {/* Status Badge */}
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${
                       isLocked 
                         ? 'bg-red-100 text-red-700 border-red-300' 
                         : item.autoLock 
@@ -206,48 +206,48 @@ export const CoordinatorDashboard = () => {
                     </span>
                   </div>
 
-                  <h4 className="font-bold text-xs text-slate-800">{item.title}</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">{item.description}</p>
+                  <h4 className="font-bold text-sm text-slate-800">{item.title}</h4>
+                  <p className="text-xs text-slate-500 mt-0.5 leading-tight">{item.description}</p>
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-slate-200/70 space-y-2">
                   {/* Date and Time Inputs */}
                   <div className="grid grid-cols-2 gap-1.5">
                     <div>
-                      <label className="block text-[10px] font-medium text-slate-500 mb-0.5 flex items-center gap-1">
-                        <Calendar size={10} /> Date
+                      <label className="block text-xs font-medium text-slate-500 mb-0.5 flex items-center gap-1">
+                        <Calendar size={12} /> Date
                       </label>
                       <input
                         type="date"
                         value={item.date}
                         onChange={(e) => updateSubmissionDeadline(key, e.target.value, item.time)}
-                        className="w-full text-xs p-1.5 bg-white border border-slate-300 rounded font-medium text-slate-800 focus:outline-none focus:border-[#003DA5]"
+                        className="w-full text-sm p-1.5 bg-white border border-slate-300 rounded font-medium text-slate-800 focus:outline-none focus:border-[#003DA5]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-medium text-slate-500 mb-0.5 flex items-center gap-1">
-                        <Clock size={10} /> Time
+                      <label className="block text-xs font-medium text-slate-500 mb-0.5 flex items-center gap-1">
+                        <Clock size={12} /> Time
                       </label>
                       <input
                         type="time"
                         value={item.time || '23:59'}
                         onChange={(e) => updateSubmissionDeadline(key, item.date, e.target.value)}
-                        className="w-full text-xs p-1.5 bg-white border border-slate-300 rounded font-medium text-slate-800 focus:outline-none focus:border-[#003DA5]"
+                        className="w-full text-sm p-1.5 bg-white border border-slate-300 rounded font-medium text-slate-800 focus:outline-none focus:border-[#003DA5]"
                       />
                     </div>
                   </div>
 
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-xs text-slate-500">
                     Deadline: <strong className="text-slate-700">{formatDeadline(item.date, item.time)}</strong>
                   </div>
 
                   {/* Auto-lock Switch */}
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs text-slate-600 font-medium">Auto-Lock:</span>
+                    <span className="text-sm text-slate-600 font-medium">Auto-Lock:</span>
                     <button
                       type="button"
                       onClick={() => toggleSubmissionAutoLock(key)}
-                      className={`px-2.5 py-0.5 rounded text-xs font-semibold transition ${
+                      className={`px-3 py-1 rounded text-xs font-semibold transition ${
                         item.autoLock 
                           ? 'bg-red-600 text-white' 
                           : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
@@ -267,28 +267,28 @@ export const CoordinatorDashboard = () => {
         {/* Table Header Controls */}
         <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-sm text-slate-800">Student Clearances & Roster</h3>
-            <span className="text-xs text-slate-500 font-medium">
+            <h3 className="font-bold text-base text-slate-800">Student Clearances & Roster</h3>
+            <span className="text-sm text-slate-500 font-medium">
               ({filteredStudents.length} Students)
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Search size={13} className="absolute left-2.5 top-2.5 text-slate-400" />
+              <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name or ID..."
-                className="pl-7 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none focus:border-[#003DA5]"
+                className="pl-7 pr-3 py-1.5 text-sm bg-slate-50 border border-slate-300 rounded focus:outline-none focus:border-[#003DA5]"
               />
             </div>
 
             <select
               value={filterClearance}
               onChange={(e) => setFilterClearance(e.target.value)}
-              className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none"
+              className="text-sm bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none"
             >
               <option value="ALL">All Clearances</option>
               <option value="PENDING_FINANCE">Pending Finance (Bursary)</option>
@@ -302,7 +302,7 @@ export const CoordinatorDashboard = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500 border-b border-slate-200">
+              <tr className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 border-b border-slate-200">
                 <th className="p-3">Student Name & ID</th>
                 <th className="p-3">Prog / CGPA</th>
                 <th className="p-3">Host Company</th>
@@ -312,12 +312,12 @@ export const CoordinatorDashboard = () => {
                 <th className="p-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 text-xs">
+            <tbody className="divide-y divide-slate-200 text-sm">
               {filteredStudents.map((student) => (
                 <tr key={student.id} className="hover:bg-slate-50 transition">
                   <td className="p-3">
                     <div className="font-semibold text-slate-800">{student.name}</div>
-                    <div className="text-[11px] text-slate-500 font-mono">{student.id}</div>
+                    <div className="text-xs text-slate-500 font-mono">{student.id}</div>
                   </td>
                   <td className="p-3">
                     <span className="font-semibold text-[#003DA5] bg-blue-50 px-1.5 py-0.5 rounded mr-1.5 border border-blue-100">{student.program}</span>
@@ -330,7 +330,7 @@ export const CoordinatorDashboard = () => {
                   <td className="p-3 text-center">
                     <button
                       onClick={() => toggleFinanceClearance(student.id)}
-                      className={`px-2.5 py-1 rounded text-xs font-semibold transition border ${
+                      className={`px-3 py-1 rounded text-xs font-semibold transition border ${
                         student.financeCleared 
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' 
                           : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
@@ -344,7 +344,7 @@ export const CoordinatorDashboard = () => {
                   <td className="p-3 text-center">
                     <button
                       onClick={() => toggleFacultyApproval(student.id)}
-                      className={`px-2.5 py-1 rounded text-xs font-semibold transition border ${
+                      className={`px-3 py-1 rounded text-xs font-semibold transition border ${
                         student.facultyApproved 
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' 
                           : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
@@ -365,17 +365,17 @@ export const CoordinatorDashboard = () => {
                     <div className="flex items-center justify-end space-x-1">
                       <button
                         onClick={() => setSelectedFolderStudent(student)}
-                        className="p-1 text-slate-500 hover:text-[#003DA5] hover:bg-slate-100 rounded transition"
+                        className="p-1.5 text-slate-500 hover:text-[#003DA5] hover:bg-slate-100 rounded transition"
                         title="View SharePoint Folders"
                       >
-                        <FolderOpen size={15} />
+                        <FolderOpen size={16} />
                       </button>
                       <button
                         onClick={() => setEmailModalStudent(student)}
-                        className="p-1 text-slate-500 hover:text-[#003DA5] hover:bg-slate-100 rounded transition"
+                        className="p-1.5 text-slate-500 hover:text-[#003DA5] hover:bg-slate-100 rounded transition"
                         title="Email Student"
                       >
-                        <Mail size={15} />
+                        <Mail size={16} />
                       </button>
                     </div>
                   </td>
@@ -390,34 +390,34 @@ export const CoordinatorDashboard = () => {
       {selectedFolderStudent && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-lg w-full p-5 border border-slate-200 shadow-md">
-            <h3 className="font-bold text-sm text-slate-800 mb-0.5">
+            <h3 className="font-bold text-base text-slate-800 mb-0.5">
               Repository Folder: {selectedFolderStudent.name}
             </h3>
-            <p className="text-[11px] text-slate-500 font-mono mb-3">/2026/INTERNSHIP SEPTEMBER 2026/{selectedFolderStudent.program}/{selectedFolderStudent.name}</p>
+            <p className="text-xs text-slate-500 font-mono mb-3">/2026/INTERNSHIP SEPTEMBER 2026/{selectedFolderStudent.program}/{selectedFolderStudent.name}</p>
 
-            <div className="space-y-1.5 border border-slate-200 rounded p-2.5 bg-slate-50 text-xs">
+            <div className="space-y-1.5 border border-slate-200 rounded p-2.5 bg-slate-50 text-sm">
               <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
                 <span>📁 01. PRE-INTERNSHIP (Clearances & SAL)</span>
-                <span className="text-slate-500 font-mono text-[11px]">2 items</span>
+                <span className="text-slate-500 font-mono text-xs">2 items</span>
               </div>
               <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
                 <span>📁 02. OFFER LETTER</span>
-                <span className="text-slate-500 font-mono text-[11px]">{selectedFolderStudent.documents?.offerLetter ? '1 item' : '0 items'}</span>
+                <span className="text-slate-500 font-mono text-xs">{selectedFolderStudent.documents?.offerLetter ? '1 item' : '0 items'}</span>
               </div>
               <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
                 <span>📁 03. REPORT DUTY AND REPLY FORM</span>
-                <span className="text-slate-500 font-mono text-[11px]">{selectedFolderStudent.documents?.reportDuty ? '1 item' : '0 items'}</span>
+                <span className="text-slate-500 font-mono text-xs">{selectedFolderStudent.documents?.reportDuty ? '1 item' : '0 items'}</span>
               </div>
               <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
                 <span>📁 04. POST-INTERNSHIP (Reports & Logbook)</span>
-                <span className="text-slate-500 font-mono text-[11px]">{selectedFolderStudent.documents?.finalReport ? '2 items' : '0 items'}</span>
+                <span className="text-slate-500 font-mono text-xs">{selectedFolderStudent.documents?.finalReport ? '2 items' : '0 items'}</span>
               </div>
             </div>
 
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setSelectedFolderStudent(null)}
-                className="bg-[#003DA5] hover:bg-[#002d7a] text-white px-3.5 py-1.5 text-xs font-semibold rounded transition"
+                className="bg-[#003DA5] hover:bg-[#002d7a] text-white px-4 py-2 text-sm font-semibold rounded transition"
               >
                 Close
               </button>

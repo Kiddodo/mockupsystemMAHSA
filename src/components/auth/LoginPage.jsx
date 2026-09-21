@@ -62,7 +62,7 @@ export const LoginPage = () => {
           </div>
           <h1 className="font-bold text-xl leading-tight">MAHSA University</h1>
           <p className="text-xs text-blue-100 mt-0.5">Faculty of Business, Finance & Information Technology</p>
-          <div className="mt-3 inline-block bg-[#002d7a] text-blue-100 text-[11px] font-medium px-2.5 py-0.5 rounded border border-blue-400/30">
+          <div className="mt-3 inline-block bg-[#002d7a] text-blue-100 text-xs font-medium px-2.5 py-1 rounded border border-blue-400/30">
             Internship Management System
           </div>
         </div>
@@ -70,12 +70,12 @@ export const LoginPage = () => {
         {/* Form Body */}
         <div className="p-6 sm:p-8">
           <div className="mb-5">
-            <h2 className="text-lg font-bold text-slate-800">Sign In to Your Account</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Choose your role to access your dashboard</p>
+            <h2 className="text-xl font-bold text-slate-800">Sign In to Your Account</h2>
+            <p className="text-sm text-slate-500 mt-0.5">Choose your role to access your dashboard</p>
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-xs text-red-700 font-medium">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700 font-medium">
               {error}
             </div>
           )}
@@ -83,14 +83,14 @@ export const LoginPage = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Role Selector Tabs */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                 Select Portal Role
               </label>
               <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded border border-slate-200">
                 <button
                   type="button"
                   onClick={() => handleRoleSelect('coordinator')}
-                  className={`py-1.5 text-xs font-semibold rounded transition ${
+                  className={`py-2 text-sm font-semibold rounded transition ${
                     role === 'coordinator'
                       ? 'bg-white text-[#003DA5] shadow-xs border border-slate-200'
                       : 'text-slate-600 hover:text-slate-900'
@@ -101,7 +101,7 @@ export const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => handleRoleSelect('lecturer')}
-                  className={`py-1.5 text-xs font-semibold rounded transition ${
+                  className={`py-2 text-sm font-semibold rounded transition ${
                     role === 'lecturer'
                       ? 'bg-white text-[#003DA5] shadow-xs border border-slate-200'
                       : 'text-slate-600 hover:text-slate-900'
@@ -112,7 +112,7 @@ export const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => handleRoleSelect('student')}
-                  className={`py-1.5 text-xs font-semibold rounded transition ${
+                  className={`py-2 text-sm font-semibold rounded transition ${
                     role === 'student'
                       ? 'bg-white text-[#003DA5] shadow-xs border border-slate-200'
                       : 'text-slate-600 hover:text-slate-900'
@@ -125,17 +125,17 @@ export const LoginPage = () => {
 
             {/* Email Field */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
                 Institutional Email
               </label>
               <div className="relative">
-                <Mail size={15} className="absolute left-3 top-2.5 text-slate-400" />
+                <Mail size={16} className="absolute left-3 top-3 text-slate-400" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded focus:outline-none focus:border-[#003DA5] text-slate-800"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-slate-300 rounded focus:outline-none focus:border-[#003DA5] text-slate-800"
                   placeholder="name@mahsa.edu.my"
                 />
               </div>
@@ -143,33 +143,33 @@ export const LoginPage = () => {
 
             {/* Password Field */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
                 Password
               </label>
               <div className="relative">
-                <Lock size={15} className="absolute left-3 top-2.5 text-slate-400" />
+                <Lock size={16} className="absolute left-3 top-3 text-slate-400" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded focus:outline-none focus:border-[#003DA5] text-slate-800"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-slate-300 rounded focus:outline-none focus:border-[#003DA5] text-slate-800"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold rounded transition text-xs flex items-center justify-center gap-1.5 mt-2"
+              className="w-full py-2.5 bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold rounded transition text-sm flex items-center justify-center gap-1.5 mt-2"
             >
               <span>Sign In</span>
-              <ChevronRight size={14} />
+              <ChevronRight size={15} />
             </button>
           </form>
 
           {/* Quick Demo Autofill section */}
           <div className="mt-6 pt-4 border-t border-slate-200">
-            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
               Demo Quick-Select
             </div>
             <div className="space-y-1.5">
@@ -178,14 +178,14 @@ export const LoginPage = () => {
                   key={cred.role}
                   type="button"
                   onClick={() => handleRoleSelect(cred.role)}
-                  className={`w-full text-left px-2.5 py-1.5 rounded border text-xs flex justify-between items-center transition ${
+                  className={`w-full text-left px-3 py-2 rounded border text-sm flex justify-between items-center transition ${
                     role === cred.role
                       ? 'bg-blue-50 border-blue-200 text-[#003DA5]'
                       : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <span className="font-semibold">{cred.label}</span>
-                  <span className="text-[11px] text-slate-500">{cred.email}</span>
+                  <span className="text-xs text-slate-500">{cred.email}</span>
                 </button>
               ))}
             </div>
@@ -193,8 +193,8 @@ export const LoginPage = () => {
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 px-6 py-3 border-t border-slate-200 text-center text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
-          <Shield size={13} className="text-slate-400" />
+        <div className="bg-slate-50 px-6 py-3 border-t border-slate-200 text-center text-xs text-slate-500 flex items-center justify-center gap-1.5">
+          <Shield size={14} className="text-slate-400" />
           <span>MAHSA University Academic Information Portal © 2026</span>
         </div>
       </div>
