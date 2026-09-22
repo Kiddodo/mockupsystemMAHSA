@@ -75,6 +75,9 @@ export const Navbar = () => {
                   <option value="DHRM">DHRM</option>
                   <option value="DBA">DBA</option>
                   <option value="BBA">BBA</option>
+                  <option value="DIM">DIM</option>
+                  <option value="BAC">BAC</option>
+                  <option value="DAC">DAC</option>
                 </select>
               </div>
             )}

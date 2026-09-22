@@ -35,8 +35,8 @@ export const LoginPage = () => {
       if (role === 'lecturer') {
         userName = 'Dr. Rahman';
       } else if (role === 'student') {
-        userName = 'Abdul Halim Bin Tamar';
-        studentId = '24-DHRM-0234';
+        userName = 'Abdullah Hasyim Bin Ahmad Iskandar';
+        studentId = 'DHRM24086001';
       }
 
       setCurrentUser({
