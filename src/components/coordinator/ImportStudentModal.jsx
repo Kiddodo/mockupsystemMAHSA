@@ -2,8 +2,9 @@ import React, { useState, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   X, Upload, Download, FileSpreadsheet, CheckCircle, 
-  AlertCircle, FileText, RefreshCw, Check
+  AlertCircle, FileText, RefreshCw, Check, ChevronDown
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const SAMPLE_CSV_CONTENT = `id,name,program,cgpa,credits,company,lecturer,financeCleared,facultyApproved
 24-DHRM-0451,Nurul Ain Binti Roslan,DHRM,3.55,68,Sunway Resort Hotel,Dr. Rahman,true,true
@@ -21,76 +22,93 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Excel-specific state
+  const [sheetNames, setSheetNames] = useState([]);
+  const [selectedSheet, setSelectedSheet] = useState('');
+  const [workbookRef, setWorkbookRef] = useState(null);
+  const [isExcelFile, setIsExcelFile] = useState(false);
+
   if (!isOpen) return null;
 
-  // Simple, robust CSV parser handling commas and quoted strings
-  const parseCSV = (text) => {
+  // Helper to split a CSV line by comma while preserving quoted values
+  const splitLine = (rowStr) => {
+    const result = [];
+    let curr = '';
+    let inQuotes = false;
+    for (let i = 0; i < rowStr.length; i++) {
+      const char = rowStr[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(curr.trim());
+        curr = '';
+      } else {
+        curr += char;
+      }
+    }
+    result.push(curr.trim());
+    return result.map(val => val.replace(/^"|"$/g, '').trim());
+  };
+
+  // Core parser that converts rows (array of arrays) into student records
+  const parseRows = (rows) => {
     try {
       setParseError('');
-      const cleanText = text.trim();
-      if (!cleanText) {
+
+      if (!rows || rows.length < 2) {
+        setParseError('Data must have at least a header row and 1 data row.');
         setParsedData([]);
         return;
       }
 
-      const lines = cleanText.split(/\r?\n/).filter(line => line.trim().length > 0);
-      if (lines.length < 2) {
-        setParseError('CSV must have at least a header row and 1 data row.');
-        setParsedData([]);
-        return;
-      }
-
-      // Helper to split a line by comma while preserving quoted values
-      const splitLine = (rowStr) => {
-        const result = [];
-        let curr = '';
-        let inQuotes = false;
-        for (let i = 0; i < rowStr.length; i++) {
-          const char = rowStr[i];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
-            result.push(curr.trim());
-            curr = '';
-          } else {
-            curr += char;
-          }
+      // Find the header row by scanning for a row containing 'student id' or 'student name'
+      let headerRowIndex = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const rowText = rows[i].map(c => String(c || '')).join(' ').toLowerCase();
+        if (rowText.includes('student id') || rowText.includes('student name')) {
+          headerRowIndex = i;
+          break;
         }
-        result.push(curr.trim());
-        return result.map(val => val.replace(/^"|"$/g, '').trim());
-      };
+      }
 
-      const headers = splitLine(lines[0]).map(h => h.toLowerCase().replace(/[\s_-]+/g, ''));
-      
+      const headers = rows[headerRowIndex].map(h => String(h || '').toLowerCase().replace(/[\s_-]+/g, ''));
+
       // Column alias matching
       const getField = (rowValues, ...aliases) => {
         for (const alias of aliases) {
-          const idx = headers.indexOf(alias);
+          const idx = headers.findIndex(h => h === alias || h.includes(alias));
           if (idx !== -1 && rowValues[idx] !== undefined) {
-            return rowValues[idx];
+            return String(rowValues[idx] || '').trim();
           }
         }
         return '';
       };
 
       const parsedRows = [];
-      for (let i = 1; i < lines.length; i++) {
-        const values = splitLine(lines[i]);
-        if (values.length === 0 || (values.length === 1 && values[0] === '')) continue;
+      for (let i = headerRowIndex + 1; i < rows.length; i++) {
+        const values = rows[i].map(c => String(c || '').trim());
+        if (values.length === 0 || values.every(v => !v)) continue;
 
-        const id = getField(values, 'id', 'studentid', 'matric', 'matricid');
-        const name = getField(values, 'name', 'studentname', 'fullname');
-        const program = (getField(values, 'program', 'programme', 'course') || 'DHRM').toUpperCase();
+        const id = getField(values, 'studentid', 'id', 'matric', 'matricid');
+        const name = getField(values, 'studentname', 'name', 'fullname');
+        
+        let program = getField(values, 'program', 'programme', 'course').toUpperCase();
+        if (!program && id) {
+          const match = id.match(/^[A-Z]+/i);
+          if (match) program = match[0].toUpperCase();
+          else program = 'DHRM';
+        }
+
         const cgpa = parseFloat(getField(values, 'cgpa', 'gpa')) || 3.00;
         const credits = parseInt(getField(values, 'credits', 'credithours'), 10) || 60;
-        const company = getField(values, 'company', 'hostcompany') || 'Pending Placement';
-        const lecturer = getField(values, 'lecturer', 'supervisor', 'academicsupervisor') || 'Dr. Rahman';
+        const company = getField(values, 'companyname', 'company', 'hostcompany') || 'Pending Placement';
+        const lecturer = getField(values, 'supervisorname', 'lecturer', 'supervisor', 'academicsupervisor') || 'Dr. Rahman';
         
-        const rawFinance = getField(values, 'financecleared', 'finance', 'bursary').toLowerCase();
+        const rawFinance = getField(values, 'financialstatus', 'financecleared', 'finance', 'bursary').toLowerCase();
         const financeCleared = rawFinance === 'true' || rawFinance === '1' || rawFinance === 'yes' || rawFinance === 'cleared';
         
-        const rawFaculty = getField(values, 'facultyapproved', 'faculty', 'facultyclearance').toLowerCase();
-        const facultyApproved = rawFaculty === 'true' || rawFaculty === '1' || rawFaculty === 'yes' || rawFaculty === 'approved';
+        const rawFaculty = getField(values, 'internletterrelease', 'facultyapproved', 'faculty', 'facultyclearance').toLowerCase();
+        const facultyApproved = rawFaculty === 'true' || rawFaculty === '1' || rawFaculty === 'yes' || rawFaculty === 'approved' || rawFaculty === 'conditionalrelease' || rawFaculty === 'conditional release';
 
         if (id && name) {
           const isExisting = students.some(s => s.id.toLowerCase() === id.toLowerCase());
@@ -110,29 +128,118 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
       }
 
       if (parsedRows.length === 0) {
-        setParseError('No valid student records found. Ensure rows have "id" and "name" columns.');
+        setParseError('No valid student records found. Ensure rows have "Student ID" and "Student Name" columns.');
       } else {
         setParsedData(parsedRows);
       }
     } catch (err) {
-      setParseError('Error parsing CSV. Please check formatting.');
+      setParseError('Error parsing data. Please check formatting.');
       setParsedData([]);
+    }
+  };
+
+  // Parse CSV text into rows, then use the core parser
+  const parseCSV = (text) => {
+    const cleanText = text.trim();
+    if (!cleanText) {
+      setParsedData([]);
+      setParseError('');
+      return;
+    }
+    const lines = cleanText.split(/\r?\n/).filter(line => line.trim().length > 0);
+    const rows = lines.map(line => splitLine(line));
+    parseRows(rows);
+  };
+
+  // Parse an Excel sheet into rows, then use the core parser
+  const parseExcelSheet = (workbook, sheetName) => {
+    try {
+      const worksheet = workbook.Sheets[sheetName];
+      if (!worksheet) {
+        setParseError(`Sheet "${sheetName}" not found.`);
+        setParsedData([]);
+        return;
+      }
+      // Convert sheet to array of arrays (each row is an array of cell values)
+      const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+      // Filter out completely empty rows
+      const nonEmptyRows = rows.filter(row => row.some(cell => String(cell || '').trim() !== ''));
+      if (nonEmptyRows.length < 2) {
+        setParseError(`Sheet "${sheetName}" has no data rows.`);
+        setParsedData([]);
+        return;
+      }
+      parseRows(nonEmptyRows);
+    } catch (err) {
+      setParseError('Error reading Excel sheet. Please check the file.');
+      setParsedData([]);
+    }
+  };
+
+  // Detect file type and handle accordingly
+  const processFile = (file) => {
+    const name = file.name.toLowerCase();
+    const isExcel = name.endsWith('.xlsx') || name.endsWith('.xls');
+
+    setFileName(file.name);
+    setParsedData([]);
+    setParseError('');
+    setSheetNames([]);
+    setSelectedSheet('');
+    setWorkbookRef(null);
+    setIsExcelFile(isExcel);
+
+    if (isExcel) {
+      // Read as binary for Excel
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheets = workbook.SheetNames;
+          setWorkbookRef(workbook);
+          setSheetNames(sheets);
+          if (sheets.length === 1) {
+            // Auto-select if only one sheet
+            setSelectedSheet(sheets[0]);
+            parseExcelSheet(workbook, sheets[0]);
+          } else {
+            setSelectedSheet('');
+            setParseError(`Excel file has ${sheets.length} sheets. Please select a sheet to import.`);
+          }
+        } catch (err) {
+          setParseError('Failed to read Excel file. Make sure it is a valid .xlsx or .xls file.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      // Read as text for CSV
+      setIsExcelFile(false);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result;
+        if (typeof content === 'string') {
+          setCsvText(content);
+          parseCSV(content);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleSheetChange = (sheetName) => {
+    setSelectedSheet(sheetName);
+    setParsedData([]);
+    setParseError('');
+    if (workbookRef && sheetName) {
+      parseExcelSheet(workbookRef, sheetName);
     }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result;
-      if (typeof content === 'string') {
-        setCsvText(content);
-        parseCSV(content);
-      }
-    };
-    reader.readAsText(file);
+    processFile(file);
   };
 
   const handleDrop = (e) => {
@@ -140,16 +247,7 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
     setDragActive(false);
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
-    setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result;
-      if (typeof content === 'string') {
-        setCsvText(content);
-        parseCSV(content);
-      }
-    };
-    reader.readAsText(file);
+    processFile(file);
   };
 
   const handleDownloadTemplate = () => {
@@ -166,6 +264,10 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
   const handleLoadDemoData = () => {
     setFileName('mahsa_demo_candidates.csv');
     setCsvText(SAMPLE_CSV_CONTENT);
+    setIsExcelFile(false);
+    setSheetNames([]);
+    setSelectedSheet('');
+    setWorkbookRef(null);
     parseCSV(SAMPLE_CSV_CONTENT);
   };
 
@@ -182,7 +284,7 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
         <div className="bg-[#003DA5] text-white px-5 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileSpreadsheet size={18} />
-            <h3 className="font-bold text-base">Import Student CSV Data</h3>
+            <h3 className="font-bold text-base">Import Student Data</h3>
           </div>
           <button 
             onClick={onClose}
@@ -245,7 +347,7 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv,text/csv"
+                accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -262,12 +364,43 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
               >
                 <Upload size={28} className="mx-auto text-[#003DA5] mb-2" />
                 <p className="font-semibold text-sm text-slate-800">
-                  {fileName ? `Selected: ${fileName}` : 'Click to select CSV file or drag and drop here'}
+                  {fileName ? `Selected: ${fileName}` : 'Click to select file or drag and drop here'}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Format: id, name, program, cgpa, credits, company, lecturer, financeCleared, facultyApproved
+                  Supports <strong>.csv</strong> and <strong>.xlsx / .xls</strong> (Excel) files
                 </p>
               </div>
+
+              {/* Sheet Selector for Excel files */}
+              {isExcelFile && sheetNames.length > 1 && (
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                    <FileSpreadsheet size={13} className="text-[#003DA5]" />
+                    Select Sheet to Import ({sheetNames.length} sheets found)
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedSheet}
+                      onChange={(e) => handleSheetChange(e.target.value)}
+                      className="w-full p-2 pr-8 bg-white border border-blue-300 rounded text-sm font-medium text-slate-800 focus:outline-none focus:border-[#003DA5] appearance-none cursor-pointer"
+                    >
+                      <option value="">-- Choose a sheet --</option>
+                      {sheetNames.map((name) => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+              )}
+
+              {/* Single sheet auto-selected indicator */}
+              {isExcelFile && sheetNames.length === 1 && (
+                <div className="mt-3 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-xs text-emerald-700 font-medium">
+                  <CheckCircle size={14} />
+                  <span>Sheet "<strong>{sheetNames[0]}</strong>" auto-selected (only 1 sheet found)</span>
+                </div>
+              )}
             </div>
           ) : (
             <div>
@@ -281,7 +414,7 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
                   setCsvText(e.target.value);
                   parseCSV(e.target.value);
                 }}
-                placeholder="id,name,program,cgpa,credits,company,lecturer,financeCleared,facultyApproved&#10;24-DHRM-0999,Nur Farah,DHRM,3.45,64,Sunway Resort,Dr. Rahman,true,true"
+                placeholder={`id,name,program,cgpa,credits,company,lecturer,financeCleared,facultyApproved\n24-DHRM-0999,Nur Farah,DHRM,3.45,64,Sunway Resort,Dr. Rahman,true,true`}
                 className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded font-mono text-xs text-slate-800 focus:outline-none focus:border-[#003DA5]"
               />
             </div>
@@ -289,7 +422,11 @@ export const ImportStudentModal = ({ isOpen, onClose }) => {
 
           {/* Validation Alert */}
           {parseError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded text-xs text-red-700 flex items-center gap-2">
+            <div className={`p-3 rounded text-xs flex items-center gap-2 ${
+              parseError.includes('select a sheet')
+                ? 'bg-blue-50 border border-blue-200 text-blue-700'
+                : 'bg-red-50 border border-red-200 text-red-700'
+            }`}>
               <AlertCircle size={15} />
               <span>{parseError}</span>
             </div>
