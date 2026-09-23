@@ -205,8 +205,8 @@ export const SplitScreenGrading = ({ student, onBack }) => {
                   <span className="text-xs font-semibold text-slate-600 truncate flex items-center gap-1.5">
                     <FileText size={13} className="text-[#003DA5] flex-shrink-0" /> {activeDoc.name}
                   </span>
-                  <a href={activeDoc.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline flex items-center gap-1 flex-shrink-0">
-                    <ExternalLink size={12} /> Open in new tab
+                  <a href={activeDoc.url} download={activeDoc.name || 'document.pdf'} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline flex items-center gap-1 flex-shrink-0">
+                    <ExternalLink size={12} /> Download / Open
                   </a>
                 </div>
                 <div className="flex-1 overflow-auto bg-slate-100 flex justify-center p-3">

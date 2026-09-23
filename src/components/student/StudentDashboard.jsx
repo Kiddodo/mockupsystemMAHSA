@@ -16,8 +16,7 @@ const PROGRAMME_NAMES = {
 };
 
 // Real file upload limits — enforced here (client-side, for immediate feedback)
-// and again server-side in storage.rules (so it can't be bypassed).
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE_BYTES = 7 * 1024 * 1024; // 7MB max for direct cloud RTDB sync
 const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
 const ALLOWED_MIME_TYPES = [
   'application/pdf',
@@ -477,6 +476,7 @@ export const StudentDashboard = () => {
                         href={currentStudent.documents.offerLetter.url}
                         target="_blank"
                         rel="noreferrer"
+                        download={currentStudent.documents.offerLetter.name}
                         className="text-[#003DA5] hover:underline flex items-center gap-2 flex-1 min-w-0"
                       >
                         <FileText size={16} className="text-[#003DA5] flex-shrink-0" /> <span className="truncate">{currentStudent.documents.offerLetter.name}</span>
@@ -522,6 +522,7 @@ export const StudentDashboard = () => {
                         href={currentStudent.documents.reportDuty.url}
                         target="_blank"
                         rel="noreferrer"
+                        download={currentStudent.documents.reportDuty.name}
                         className="text-[#003DA5] hover:underline flex items-center gap-2 flex-1 min-w-0"
                       >
                         <FileText size={16} className="text-[#003DA5] flex-shrink-0" /> <span className="truncate">{currentStudent.documents.reportDuty.name}</span>
@@ -620,7 +621,7 @@ export const StudentDashboard = () => {
                     <p className="text-sm text-slate-500 mt-0.5">12-week verified daily reflection entries.</p>
                     {currentStudent?.documents?.logbook && (
                       <div className="mt-2.5 flex items-center gap-1.5">
-                        <a href={currentStudent.documents.logbook.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.logbook.name}</a>
+                        <a href={currentStudent.documents.logbook.url} download={currentStudent.documents.logbook.name} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.logbook.name}</a>
                         <button type="button" onClick={() => handleDocRemove('logbook', currentStudent.documents.logbook.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
                           <Trash2 size={17} />
                         </button>
@@ -647,7 +648,7 @@ export const StudentDashboard = () => {
                     <p className="text-sm text-slate-500 mt-0.5">Chapters 1 to 5 with executive summary.</p>
                     {currentStudent?.documents?.finalReport && (
                       <div className="mt-2.5 flex items-center gap-1.5">
-                        <a href={currentStudent.documents.finalReport.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.finalReport.name}</a>
+                        <a href={currentStudent.documents.finalReport.url} download={currentStudent.documents.finalReport.name} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.finalReport.name}</a>
                         <button type="button" onClick={() => handleDocRemove('finalReport', currentStudent.documents.finalReport.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
                           <Trash2 size={17} />
                         </button>
@@ -674,7 +675,7 @@ export const StudentDashboard = () => {
                     <p className="text-sm text-slate-500 mt-0.5">Industry conduct assessment rubric.</p>
                     {currentStudent?.documents?.supervisorEvaluation && (
                       <div className="mt-2.5 flex items-center gap-1.5">
-                        <a href={currentStudent.documents.supervisorEvaluation.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.supervisorEvaluation.name}</a>
+                        <a href={currentStudent.documents.supervisorEvaluation.url} download={currentStudent.documents.supervisorEvaluation.name} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.supervisorEvaluation.name}</a>
                         <button type="button" onClick={() => handleDocRemove('supervisorEvaluation', currentStudent.documents.supervisorEvaluation.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
                           <Trash2 size={17} />
                         </button>

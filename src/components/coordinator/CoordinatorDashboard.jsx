@@ -448,6 +448,7 @@ export const CoordinatorDashboard = () => {
                           href={doc.url}
                           target="_blank"
                           rel="noreferrer"
+                          download={doc.name || 'document.pdf'}
                           className="text-[#003DA5] font-semibold text-xs flex items-center gap-1 hover:underline"
                         >
                           <Download size={13} /> View

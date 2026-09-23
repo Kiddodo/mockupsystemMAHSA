@@ -314,58 +314,39 @@ export const AppProvider = ({ children }) => {
     });
   };
 
-  // file is a real File object selected by the student.
-  // When Firebase Storage is configured, it's uploaded there so coordinators
-  // and lecturers on any device get a real, working download link. Otherwise
-  // we fall back to an in-memory object URL, which only works for viewers in
-  // this same browser tab/session (no backend to share it through).
-  const updateStudentDocument = async (studentId, docKey, file, advancePhaseTo = null) => {
-    if (useFirebase && storage) {
-      showToast(`Uploading ${file.name}...`, 'info');
-      try {
-        const path = `students/${studentKey(studentId)}/${docKey}/${Date.now()}_${file.name}`;
-        const fileRef = storageRef(storage, path);
-        await uploadBytes(fileRef, file);
-        const url = await getDownloadURL(fileRef);
-        applyStudentDocument(studentId, docKey, {
-          name: file.name,
-          url,
-          size: file.size,
-          uploadedAt: new Date().toISOString()
-        }, advancePhaseTo);
-        showToast(`${file.name} uploaded successfully.`, 'success');
-      } catch (err) {
-        console.error('Firebase Storage upload error:', err);
-        // Graceful fallback: show the file on screen so user testing isn't blocked
-        applyStudentDocument(studentId, docKey, {
-          name: file.name,
-          url: URL.createObjectURL(file),
-          size: file.size,
-          uploadedAt: new Date().toISOString()
-        }, advancePhaseTo);
-        showToast(`Saved locally only. (Enable Firebase Storage in Firebase Console for cloud upload)`, 'warning');
-      }
-      return;
-    }
-
-    // Local fallback (no Firebase Storage configured)
-    const current = students.find(s => s.id === studentId);
-    const existing = current?.documents?.[docKey];
-    if (existing?.url && existing.url.startsWith('blob:')) {
-      URL.revokeObjectURL(existing.url);
-    }
-    applyStudentDocument(studentId, docKey, {
-      name: file.name,
-      url: URL.createObjectURL(file),
-      size: file.size,
-      uploadedAt: new Date().toISOString()
-    }, advancePhaseTo);
-    showToast(`${file.name} uploaded successfully (local only — not saved to Firebase Storage).`, 'success');
+  // Helper to encode a file to Base64 data URL so documents sync directly
+  // to Firebase Realtime Database without requiring a paid Firebase Storage plan.
+  const readFileAsDataUrl = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
   };
 
-  // Deletes an uploaded document: removes the real file from Firebase Storage
-  // (or revokes the local blob URL when Storage wasn't used) and clears the
-  // field on the student record.
+  // Upload student document: encodes file to Base64 data URL and saves directly
+  // to Firebase Realtime Database so all coordinators, lecturers, and students
+  // can view and download real files in real-time with zero credit card needed.
+  const updateStudentDocument = async (studentId, docKey, file, advancePhaseTo = null) => {
+    showToast(`Uploading ${file.name}...`, 'info');
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      applyStudentDocument(studentId, docKey, {
+        name: file.name,
+        url: dataUrl,
+        size: file.size,
+        type: file.type || 'application/pdf',
+        uploadedAt: new Date().toISOString()
+      }, advancePhaseTo);
+      showToast(`${file.name} uploaded successfully and synced to Firebase!`, 'success');
+    } catch (err) {
+      console.error('Document upload error:', err);
+      showToast(`Upload failed: ${err.message}`, 'warning');
+    }
+  };
+
+  // Deletes an uploaded document from Firebase and clears field on student record.
   const removeStudentDocument = async (studentId, docKey) => {
     const current = students.find(s => s.id === studentId);
     const existing = current?.documents?.[docKey];
@@ -374,13 +355,9 @@ export const AppProvider = ({ children }) => {
     try {
       if (existing.url?.startsWith('blob:')) {
         URL.revokeObjectURL(existing.url);
-      } else if (existing.url && storage) {
-        await deleteObject(storageRef(storage, existing.url));
       }
     } catch (err) {
-      // File may already be gone from Storage (e.g. deleted manually) — that's fine,
-      // we still want to clear the field either way.
-      console.warn('Storage delete warning:', err.message);
+      console.warn('Document cleanup warning:', err.message);
     }
 
     updateStudent(studentId, s => ({
