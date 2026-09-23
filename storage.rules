@@ -1,0 +1,32 @@
+rules_version = '2';
+
+// Real server-side enforcement of file size and type for student document
+// uploads. Client-side checks in the app give instant feedback, but only
+// these rules actually stop an oversized or wrong-type file from being
+// written to Storage — the client check alone can be bypassed.
+//
+// Note: this app has no Firebase Authentication yet (login is a local
+// hardcoded demo list), so these rules can only restrict WHAT gets
+// uploaded, not WHO uploads it. Restricting who can read/write requires
+// adding real Firebase Auth first — a separate, larger change.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /students/{studentId}/{docKey}/{fileName} {
+      allow read: if true;
+      allow write: if request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType in [
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'image/jpeg',
+                        'image/png'
+                      ];
+      allow delete: if true;
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

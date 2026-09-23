@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, AlertCircle, MessageSquare, Award } from 'lucide-react';
+import { ArrowLeft, ZoomIn, ZoomOut, Check, FileText, AlertCircle, MessageSquare, Award, ExternalLink, FileX } from 'lucide-react';
 
 const LOGBOOK_TIERS = [
   { id: 'excellent', label: 'Excellent: Comprehensive reflections, verified weekly', min: 18, max: 20, defaultScore: 19 },
@@ -180,60 +180,56 @@ export const SplitScreenGrading = ({ student, onBack }) => {
             </div>
           </div>
 
-          {/* Document Content View */}
-          <div className="flex-1 p-5 overflow-y-auto flex justify-center">
-            <div 
-              style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-              className="bg-white rounded border border-slate-300 shadow-sm p-6 max-w-lg w-full text-xs leading-relaxed text-slate-700 transition-transform duration-100 space-y-3"
-            >
-              <div className="border-b-2 border-[#003DA5] pb-2 text-center">
-                <div className="font-bold text-sm text-[#003DA5]">MAHSA UNIVERSITY INDUSTRIAL TRAINING</div>
-                <div className="text-xs uppercase text-slate-500">{student.program} · {student.company}</div>
+          {/* Document Content View — the actual file the student uploaded */}
+          {(() => {
+            const DOC_KEY_FOR_TAB = { logbook: 'logbook', report: 'finalReport', duty: 'reportDuty' };
+            const activeDoc = student?.documents?.[DOC_KEY_FOR_TAB[docTab]];
+            const isPdf = activeDoc?.name?.toLowerCase().endsWith('.pdf');
+            const isImage = /\.(png|jpe?g|gif|webp)$/i.test(activeDoc?.name || '');
+
+            if (!activeDoc?.url) {
+              return (
+                <div className="flex-1 flex items-center justify-center p-8">
+                  <div className="text-center text-slate-400">
+                    <FileX size={36} className="mx-auto mb-2" />
+                    <p className="text-sm font-semibold text-slate-500">No file uploaded yet</p>
+                    <p className="text-xs mt-1">The student hasn't submitted this document.</p>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="px-4 py-2 bg-white border-b border-slate-200 flex items-center justify-between flex-shrink-0">
+                  <span className="text-xs font-semibold text-slate-600 truncate flex items-center gap-1.5">
+                    <FileText size={13} className="text-[#003DA5] flex-shrink-0" /> {activeDoc.name}
+                  </span>
+                  <a href={activeDoc.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline flex items-center gap-1 flex-shrink-0">
+                    <ExternalLink size={12} /> Open in new tab
+                  </a>
+                </div>
+                <div className="flex-1 overflow-auto bg-slate-100 flex justify-center p-3">
+                  {(isPdf || isImage) ? (
+                    <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }} className="w-full h-full transition-transform duration-100">
+                      {isPdf ? (
+                        <iframe src={activeDoc.url} title={activeDoc.name} className="w-full h-full bg-white rounded border border-slate-300 shadow-sm" style={{ minHeight: '700px' }} />
+                      ) : (
+                        <img src={activeDoc.url} alt={activeDoc.name} className="max-w-full rounded border border-slate-300 shadow-sm bg-white" />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center text-center text-slate-500 text-sm p-8">
+                      <div>
+                        <FileText size={28} className="mx-auto mb-2 text-slate-400" />
+                        This file type can't be previewed here — use "Open in new tab" to view or download it.
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-
-              {docTab === 'logbook' && (
-                <div className="space-y-3">
-                  <h4 className="font-bold text-slate-800 text-sm">WEEKLY ACTIVITY LOG SUMMARY</h4>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded">
-                    <strong className="block text-slate-800 mb-0.5">Week 1–2: Orientation & Department Rotation</strong>
-                    <p className="text-xs text-slate-600">Assisted with HR talent onboarding, database entry, and ERP document compilation. Received full induction.</p>
-                  </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded">
-                    <strong className="block text-slate-800 mb-0.5">Week 3–8: Talent Sourcing & Performance Appraisals</strong>
-                    <p className="text-xs text-slate-600">Screened 40+ candidate applications, coordinated initial interviews, and updated staff training matrices.</p>
-                  </div>
-                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded">
-                    <strong className="block text-slate-800 mb-0.5">Week 9–12: Special Project & Final Review</strong>
-                    <p className="text-xs text-slate-600">Completed employee satisfaction survey analytics and delivered presentation to senior management.</p>
-                  </div>
-                </div>
-              )}
-
-              {docTab === 'report' && (
-                <div className="space-y-3">
-                  <h4 className="font-bold text-slate-800 text-sm">FINAL REPORT: HR SYSTEMS MODERNIZATION</h4>
-                  <p className="text-xs text-slate-600">
-                    <strong>Chapter 1:</strong> Introduction to {student.company} organizational structure and human resources division.
-                  </p>
-                  <p className="text-xs text-slate-600">
-                    <strong>Chapter 2:</strong> Literature review on automated onboarding frameworks in the Malaysian hospitality sector.
-                  </p>
-                  <p className="text-xs text-slate-600">
-                    <strong>Chapter 3:</strong> Methodology & empirical findings across 12-week analytical engagement.
-                  </p>
-                </div>
-              )}
-
-              {docTab === 'duty' && (
-                <div className="space-y-3">
-                  <h4 className="font-bold text-slate-800 text-sm">ENDORSED REPORT DUTY CONFIRMATION</h4>
-                  <p className="text-xs text-slate-600">
-                    This confirms that {student.name} duly reported for training at {student.company} on 1 September 2026 under the mentorship of the HR Department.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+            );
+          })()}
         </div>
 
         {/* Right: Digital Marking Form */}

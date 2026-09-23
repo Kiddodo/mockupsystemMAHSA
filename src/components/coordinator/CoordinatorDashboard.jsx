@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { 
   Users, CheckCircle, Clock, Building2, Upload, FileSpreadsheet, 
   Lock, Unlock, Search, ShieldCheck, Mail, FolderOpen, AlertCircle,
-  Calendar, Check, SlidersHorizontal, ShieldAlert
+  Calendar, Check, SlidersHorizontal, ShieldAlert, Download, FileText, Trash2
 } from 'lucide-react';
 import { ImportStudentModal } from './ImportStudentModal';
 
@@ -12,7 +12,7 @@ export const CoordinatorDashboard = () => {
     students, session, selectedProgram, deadlines, 
     updateSubmissionDeadline, toggleSubmissionAutoLock, setAllAutoLocks,
     isSubmissionDeadlinePassed, isSubmissionLocked, formatDeadline,
-    toggleFinanceClearance, toggleFacultyApproval, showToast 
+    toggleFinanceClearance, toggleFacultyApproval, showToast, removeStudentDocument 
   } = useApp();
 
   const [search, setSearch] = useState('');
@@ -389,31 +389,61 @@ export const CoordinatorDashboard = () => {
       </div>
 
       {/* SharePoint Folders Modal */}
-      {selectedFolderStudent && (
+      {selectedFolderStudent && (() => {
+        // Re-derive from the live students list so a Remove click updates this modal immediately
+        const liveFolderStudent = students.find(s => s.id === selectedFolderStudent.id) || selectedFolderStudent;
+        return (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-lg w-full p-5 border border-slate-200 shadow-md">
             <h3 className="font-bold text-base text-slate-800 mb-0.5">
-              Repository Folder: {selectedFolderStudent.name}
+              Repository Folder: {liveFolderStudent.name}
             </h3>
-            <p className="text-xs text-slate-500 font-mono mb-3">/2026/INTERNSHIP SEPTEMBER 2026/{selectedFolderStudent.program}/{selectedFolderStudent.name}</p>
+            <p className="text-xs text-slate-500 font-mono mb-3">/2026/INTERNSHIP SEPTEMBER 2026/{liveFolderStudent.program}/{liveFolderStudent.name}</p>
 
             <div className="space-y-1.5 border border-slate-200 rounded p-2.5 bg-slate-50 text-sm">
-              <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
-                <span>📁 01. PRE-INTERNSHIP (Clearances & SAL)</span>
-                <span className="text-slate-500 font-mono text-xs">2 items</span>
-              </div>
-              <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
-                <span>📁 02. OFFER LETTER</span>
-                <span className="text-slate-500 font-mono text-xs">{selectedFolderStudent.documents?.offerLetter ? '1 item' : '0 items'}</span>
-              </div>
-              <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
-                <span>📁 03. REPORT DUTY AND REPLY FORM</span>
-                <span className="text-slate-500 font-mono text-xs">{selectedFolderStudent.documents?.reportDuty ? '1 item' : '0 items'}</span>
-              </div>
-              <div className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
-                <span>📁 04. POST-INTERNSHIP (Reports & Logbook)</span>
-                <span className="text-slate-500 font-mono text-xs">{selectedFolderStudent.documents?.finalReport ? '2 items' : '0 items'}</span>
-              </div>
+              {[
+                { key: 'offerLetter', label: '02. Offer Letter' },
+                { key: 'reportDuty', label: '03. Report Duty Form' },
+                { key: 'logbook', label: '04. Weekly Logbook' },
+                { key: 'finalReport', label: '04. Final Internship Report' },
+                { key: 'supervisorEvaluation', label: '04. Supervisor Evaluation' },
+              ].map(({ key, label }) => {
+                const doc = liveFolderStudent.documents?.[key];
+                return (
+                  <div key={key} className="p-2 bg-white rounded border border-slate-200 flex justify-between items-center gap-2">
+                    <span className="flex items-center gap-1.5 truncate">
+                      <FileText size={14} className="text-slate-400 flex-shrink-0" />
+                      <span className="truncate">{label}{doc?.name ? ` — ${doc.name}` : ''}</span>
+                    </span>
+                    {doc?.url ? (
+                      <span className="flex items-center gap-2.5 flex-shrink-0">
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[#003DA5] font-semibold text-xs flex items-center gap-1 hover:underline"
+                        >
+                          <Download size={13} /> View
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm(`Remove "${doc.name}"? The student will need to upload it again.`)) {
+                              removeStudentDocument(liveFolderStudent.id, key);
+                            }
+                          }}
+                          className="text-slate-400 hover:text-red-600"
+                          title="Remove"
+                        >
+                          <Trash2 size={17} />
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 font-mono text-xs flex-shrink-0">Not uploaded</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-4 flex justify-end">
@@ -426,7 +456,8 @@ export const CoordinatorDashboard = () => {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Email Modal */}
       {emailModalStudent && (

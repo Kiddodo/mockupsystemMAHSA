@@ -21,6 +21,8 @@
     },
     "homepage": "https://github.com/Kiddodo/mockupsystemMAHSA#readme",
     "dependencies": {
+        "firebase": "^12.19.0",
+        "jspdf": "^4.2.1",
         "lucide-react": "^1.47.0",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",

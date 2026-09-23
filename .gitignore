@@ -3,3 +3,4 @@ dist/
 index.html.bak
 .DS_Store
 *.log
+.env.local

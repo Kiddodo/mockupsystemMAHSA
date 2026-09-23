@@ -2,12 +2,100 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   CheckCircle2, Clock, Lock, FileText, Download, Upload, 
-  AlertCircle, Eye, Check, Calendar
+  AlertCircle, Eye, Check, Calendar, Trash2
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+
+const PROGRAMME_NAMES = {
+  DHRM: 'Diploma in Human Resources Management',
+  DBA: 'Diploma in Business Administration',
+  BBA: 'Bachelor in Business Administration',
+  DAC: 'Diploma in Accounting',
+  BAC: 'Bachelor in Accounting',
+  DIM: 'Diploma in Marketing'
+};
+
+// Real file upload limits — enforced here (client-side, for immediate feedback)
+// and again server-side in storage.rules (so it can't be bypassed).
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
+const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png'
+];
+
+const formatFileSize = (bytes) => {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+  return `${Math.ceil(bytes / 1024)}KB`;
+};
+
+const generateSalPdf = (student) => {
+  const programmeName = PROGRAMME_NAMES[student?.program] || student?.program || '';
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const marginX = 56;
+  let y = 64;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(0, 61, 165);
+  doc.text('MAHSA UNIVERSITY', pageWidth / 2, y, { align: 'center' });
+  y += 18;
+  doc.setFontSize(10);
+  doc.setTextColor(90, 90, 90);
+  doc.text('Faculty of Business, Finance and Information Technology', pageWidth / 2, y, { align: 'center' });
+  y += 10;
+  doc.setDrawColor(0, 61, 165);
+  doc.setLineWidth(1.5);
+  doc.line(marginX, y, pageWidth - marginX, y);
+  y += 30;
+
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text(new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' }), marginX, y);
+  y += 24;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('TO: THE HUMAN RESOURCE MANAGER', marginX, y);
+  y += 24;
+
+  doc.setFont('helvetica', 'bold');
+  const reLine = doc.splitTextToSize(
+    `RE: STUDENT INDUSTRIAL TRAINING APPLICATION — ${(student?.name || '').toUpperCase()} (${student?.id || ''})`,
+    pageWidth - marginX * 2
+  );
+  doc.text(reLine, marginX, y);
+  y += reLine.length * 14 + 12;
+
+  doc.setFont('helvetica', 'normal');
+  const body = doc.splitTextToSize(
+    `This is to confirm that the above-named student is registered full-time in the ${programmeName} (${student?.program || ''}) programme at MAHSA University and is officially endorsed by the Faculty to undergo industrial training. ` +
+    `We would be grateful if your organisation could consider the student for an industrial placement, and kindly furnish us with your reply using the attached Company Reply Form.`,
+    pageWidth - marginX * 2
+  );
+  doc.text(body, marginX, y);
+  y += body.length * 14 + 30;
+
+  doc.text('Thank you for your kind attention and cooperation.', marginX, y);
+  y += 36;
+  doc.text('Yours faithfully,', marginX, y);
+  y += 48;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Internship Coordinator', marginX, y);
+  y += 14;
+  doc.setFont('helvetica', 'normal');
+  doc.text('MAHSA University', marginX, y);
+
+  doc.save(`SAL_${student?.id || 'student'}.pdf`);
+};
 
 export const StudentDashboard = () => {
   const { 
-    currentStudent, submitPhase1Registration, updateStudentDocument, 
+    currentStudent, submitPhase1Registration, updateStudentDocument, removeStudentDocument,
     deadlines, isSubmissionLocked, formatDeadline, showToast 
   } = useApp();
 
@@ -22,6 +110,40 @@ export const StudentDashboard = () => {
     preferredLocation: currentStudent?.registrationData?.preferredLocation || 'Kuala Lumpur / Selangor',
     emergencyContact: currentStudent?.registrationData?.emergencyContact || 'Tamar Bin Hassan (Father) - +60 19-876 5432'
   });
+
+  const handleDocUpload = (e, docKey, advancePhaseTo) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fileExt = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    const typeAllowed = ALLOWED_MIME_TYPES.includes(file.type) || ALLOWED_FILE_EXTENSIONS.includes(fileExt);
+
+    if (!typeAllowed) {
+      showToast(
+        `"${file.name}" isn't an allowed file type. Please upload PDF, Word (.doc/.docx), or an image (.jpg/.png) instead.`,
+        'warning'
+      );
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      showToast(
+        `"${file.name}" is ${formatFileSize(file.size)}, which is over the 10MB limit. Please upload a smaller file.`,
+        'warning'
+      );
+      e.target.value = '';
+      return;
+    }
+
+    updateStudentDocument(currentStudent.id, docKey, file, advancePhaseTo);
+    e.target.value = '';
+  };
+
+  const handleDocRemove = (docKey, docName) => {
+    if (!window.confirm(`Remove "${docName}"? You'll need to upload it again.`)) return;
+    removeStudentDocument(currentStudent.id, docKey);
+  };
 
   const handlePhase1Submit = (e) => {
     e.preventDefault();
@@ -171,6 +293,26 @@ export const StudentDashboard = () => {
             </div>
           </div>
 
+          <div className="bg-white rounded-lg border border-slate-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 bg-[#003DA5] text-white rounded flex items-center justify-center flex-shrink-0">
+                <FileText size={17} />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-slate-800">Re-Registration Form Checklist</h3>
+                <p className="text-xs text-slate-500 mt-0.5">MAHSA University official checklist — complete this alongside your re-enrolment stations before submitting below.</p>
+              </div>
+            </div>
+            <a
+              href="/forms/re-registration-checklist.pdf"
+              download
+              onClick={() => showToast('Re-Registration Form Checklist downloaded.', 'info')}
+              className="bg-white hover:bg-slate-50 border border-slate-300 font-semibold text-sm px-3.5 py-1.5 rounded flex items-center gap-1.5 transition text-slate-700 flex-shrink-0"
+            >
+              <Download size={15} /> Download
+            </a>
+          </div>
+
           <div className="bg-white rounded-lg border border-slate-200 p-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
               <div>
@@ -257,7 +399,13 @@ export const StudentDashboard = () => {
                   <button onClick={() => setShowSalModal(true)} className="bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold text-sm px-3.5 py-1.5 rounded flex items-center gap-1.5 transition">
                     <Eye size={15} /> Preview SAL
                   </button>
-                  <button onClick={() => showToast('SAL PDF Downloaded.', 'success')} className="bg-white hover:bg-slate-50 border border-slate-300 font-semibold text-sm px-3.5 py-1.5 rounded flex items-center gap-1.5 transition text-slate-700">
+                  <button
+                    onClick={() => {
+                      generateSalPdf(currentStudent);
+                      showToast('SAL PDF Downloaded.', 'success');
+                    }}
+                    className="bg-white hover:bg-slate-50 border border-slate-300 font-semibold text-sm px-3.5 py-1.5 rounded flex items-center gap-1.5 transition text-slate-700"
+                  >
                     <Download size={15} /> Download PDF
                   </button>
                 </div>
@@ -268,12 +416,12 @@ export const StudentDashboard = () => {
                 <h4 className="font-bold text-base text-slate-800 mb-3">Official Forms & Rubrics Kit</h4>
                 <div className="grid md:grid-cols-3 gap-3">
                   {[
-                    { title: 'Company Reply Form', desc: 'To be signed by employer offering position.' },
-                    { title: 'Report Duty Form', desc: 'To be confirmed by supervisor on Week 1.' },
-                    { title: 'Weekly Logbook Template', desc: '12-week activity reflection log.' },
-                    { title: 'Supervisor Evaluation Form', desc: 'Industry mentor conduct grading rubric.' },
-                    { title: 'Student Feedback Form', desc: 'Host company evaluation survey.' },
-                    { title: 'Final Report Rubric', desc: 'Chapters 1 to 5 marking guidelines.' }
+                    { title: 'Company Reply Form', desc: 'To be signed by employer offering position.', file: '/forms/reply-form.pdf' },
+                    { title: 'Report Duty Form', desc: 'To be confirmed by supervisor on Week 1.', file: '/forms/report-duty-form.pdf' },
+                    { title: 'Weekly Logbook Template', desc: '12-week activity reflection log.', file: '/forms/weekly-logbook.pdf' },
+                    { title: 'Supervisor Evaluation Form', desc: 'Industry mentor conduct grading rubric.', file: '/forms/supervisor-evaluation-form.pdf' },
+                    { title: 'Student Feedback Form', desc: 'Host company evaluation survey.', file: '/forms/student-feedback-form.pdf' },
+                    { title: 'Final Report Rubric', desc: 'Chapters 1 to 5 marking guidelines.', file: '/forms/final-report-rubric.pdf' }
                   ].map((item, idx) => (
                     <div key={idx} className="p-3.5 rounded border border-slate-200 bg-slate-50/50 flex flex-col justify-between">
                       <div>
@@ -281,9 +429,14 @@ export const StudentDashboard = () => {
                         <div className="font-bold text-sm text-slate-800">{item.title}</div>
                         <div className="text-xs text-slate-500 mt-0.5">{item.desc}</div>
                       </div>
-                      <button onClick={() => showToast(`${item.title} downloaded.`, 'info')} className="mt-3 text-sm font-semibold text-[#003DA5] flex items-center gap-1">
+                      <a
+                        href={item.file}
+                        download
+                        onClick={() => showToast(`${item.title} downloaded.`, 'info')}
+                        className="mt-3 text-sm font-semibold text-[#003DA5] flex items-center gap-1"
+                      >
                         <Download size={14} /> Download
-                      </button>
+                      </a>
                     </div>
                   ))}
                 </div>
@@ -319,8 +472,18 @@ export const StudentDashboard = () => {
                   <p className="text-sm text-slate-500 mt-0.5">Official acceptance letter with internship allowance and tenure.</p>
                   
                   {currentStudent?.documents?.offerLetter && (
-                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-sm font-medium text-slate-700 flex items-center gap-2">
-                      <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.offerLetter}
+                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-sm font-medium flex items-center gap-2">
+                      <a
+                        href={currentStudent.documents.offerLetter.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#003DA5] hover:underline flex items-center gap-2 flex-1 min-w-0"
+                      >
+                        <FileText size={16} className="text-[#003DA5] flex-shrink-0" /> <span className="truncate">{currentStudent.documents.offerLetter.name}</span>
+                      </a>
+                      <button type="button" onClick={() => handleDocRemove('offerLetter', currentStudent.documents.offerLetter.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
+                        <Trash2 size={20} />
+                      </button>
                     </div>
                   )}
 
@@ -331,14 +494,13 @@ export const StudentDashboard = () => {
                   )}
                 </div>
 
-                <button
-                  disabled={lockOffer}
-                  onClick={() => updateStudentDocument(currentStudent.id, 'offerLetter', 'OfferLetter_GrandHyatt.pdf', 3)}
-                  className="mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-sm rounded flex items-center justify-center gap-1.5 transition"
+                <label
+                  className={`mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold text-sm rounded flex items-center justify-center gap-1.5 transition cursor-pointer ${lockOffer ? 'opacity-50 pointer-events-none' : ''}`}
                 >
+                  <input type="file" className="hidden" disabled={lockOffer} onChange={(e) => handleDocUpload(e, 'offerLetter', 3)} accept=".pdf,.doc,.docx,image/*" />
                   <Upload size={14} /> 
                   <span>{lockOffer ? 'Uploads Closed' : currentStudent?.documents?.offerLetter ? 'Replace Offer Letter' : 'Upload Offer Letter'}</span>
-                </button>
+                </label>
               </div>
 
               {/* Step 2: Report Duty Form */}
@@ -355,8 +517,18 @@ export const StudentDashboard = () => {
                   <p className="text-sm text-slate-500 mt-0.5">Signed by company supervisor confirming reporting date.</p>
                   
                   {currentStudent?.documents?.reportDuty && (
-                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-sm font-medium text-slate-700 flex items-center gap-2">
-                      <FileText size={16} className="text-[#003DA5]" /> {currentStudent.documents.reportDuty}
+                    <div className="mt-3 p-2.5 bg-slate-50 border rounded text-sm font-medium flex items-center gap-2">
+                      <a
+                        href={currentStudent.documents.reportDuty.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#003DA5] hover:underline flex items-center gap-2 flex-1 min-w-0"
+                      >
+                        <FileText size={16} className="text-[#003DA5] flex-shrink-0" /> <span className="truncate">{currentStudent.documents.reportDuty.name}</span>
+                      </a>
+                      <button type="button" onClick={() => handleDocRemove('reportDuty', currentStudent.documents.reportDuty.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
+                        <Trash2 size={20} />
+                      </button>
                     </div>
                   )}
 
@@ -367,14 +539,13 @@ export const StudentDashboard = () => {
                   )}
                 </div>
 
-                <button
-                  disabled={lockDuty}
-                  onClick={() => updateStudentDocument(currentStudent.id, 'reportDuty', 'ReportDuty_Signed.pdf', 4)}
-                  className="mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] disabled:opacity-50 text-white font-semibold text-sm rounded flex items-center justify-center gap-1.5 transition"
+                <label
+                  className={`mt-5 w-full py-2 bg-[#003DA5] hover:bg-[#002d7a] text-white font-semibold text-sm rounded flex items-center justify-center gap-1.5 transition cursor-pointer ${lockDuty ? 'opacity-50 pointer-events-none' : ''}`}
                 >
+                  <input type="file" className="hidden" disabled={lockDuty} onChange={(e) => handleDocUpload(e, 'reportDuty', 4)} accept=".pdf,.doc,.docx,image/*" />
                   <Upload size={14} /> 
                   <span>{lockDuty ? 'Uploads Closed' : currentStudent?.documents?.reportDuty ? 'Replace Report Duty Form' : 'Upload Report Duty Form'}</span>
-                </button>
+                </label>
               </div>
             </div>
           )}
@@ -448,19 +619,21 @@ export const StudentDashboard = () => {
                     <h4 className="font-bold text-base text-slate-800">Completed Logbook</h4>
                     <p className="text-sm text-slate-500 mt-0.5">12-week verified daily reflection entries.</p>
                     {currentStudent?.documents?.logbook && (
-                      <p className="mt-2.5 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.logbook}</p>
+                      <div className="mt-2.5 flex items-center gap-1.5">
+                        <a href={currentStudent.documents.logbook.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.logbook.name}</a>
+                        <button type="button" onClick={() => handleDocRemove('logbook', currentStudent.documents.logbook.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
+                          <Trash2 size={17} />
+                        </button>
+                      </div>
                     )}
                     {lockLogbook && (
                       <div className="mt-2 text-xs text-red-600 font-medium">Locked (Cut-off passed)</div>
                     )}
                   </div>
-                  <button 
-                    disabled={lockLogbook}
-                    onClick={() => updateStudentDocument(currentStudent.id, 'logbook', 'Final_Logbook.pdf')} 
-                    className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-semibold rounded transition text-slate-700"
-                  >
+                  <label className={`mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white text-xs font-semibold rounded transition text-slate-700 text-center cursor-pointer ${lockLogbook ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input type="file" className="hidden" disabled={lockLogbook} onChange={(e) => handleDocUpload(e, 'logbook')} accept=".pdf,.doc,.docx,image/*" />
                     {lockLogbook ? 'Locked' : 'Upload Logbook'}
-                  </button>
+                  </label>
                 </div>
 
                 {/* Final Report */}
@@ -473,19 +646,21 @@ export const StudentDashboard = () => {
                     <h4 className="font-bold text-base text-slate-800">Final Internship Report</h4>
                     <p className="text-sm text-slate-500 mt-0.5">Chapters 1 to 5 with executive summary.</p>
                     {currentStudent?.documents?.finalReport && (
-                      <p className="mt-2.5 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.finalReport}</p>
+                      <div className="mt-2.5 flex items-center gap-1.5">
+                        <a href={currentStudent.documents.finalReport.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.finalReport.name}</a>
+                        <button type="button" onClick={() => handleDocRemove('finalReport', currentStudent.documents.finalReport.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
+                          <Trash2 size={17} />
+                        </button>
+                      </div>
                     )}
                     {lockReport && (
                       <div className="mt-2 text-xs text-red-600 font-medium">Locked (Cut-off passed)</div>
                     )}
                   </div>
-                  <button 
-                    disabled={lockReport}
-                    onClick={() => updateStudentDocument(currentStudent.id, 'finalReport', 'Internship_Report_Final.pdf')} 
-                    className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-semibold rounded transition text-slate-700"
-                  >
+                  <label className={`mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white text-xs font-semibold rounded transition text-slate-700 text-center cursor-pointer ${lockReport ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input type="file" className="hidden" disabled={lockReport} onChange={(e) => handleDocUpload(e, 'finalReport')} accept=".pdf,.doc,.docx,image/*" />
                     {lockReport ? 'Locked' : 'Upload Report'}
-                  </button>
+                  </label>
                 </div>
 
                 {/* Supervisor Evaluation */}
@@ -498,19 +673,21 @@ export const StudentDashboard = () => {
                     <h4 className="font-bold text-base text-slate-800">Supervisor Evaluation</h4>
                     <p className="text-sm text-slate-500 mt-0.5">Industry conduct assessment rubric.</p>
                     {currentStudent?.documents?.supervisorEvaluation && (
-                      <p className="mt-2.5 text-xs font-semibold text-[#003DA5]">{currentStudent.documents.supervisorEvaluation}</p>
+                      <div className="mt-2.5 flex items-center gap-1.5">
+                        <a href={currentStudent.documents.supervisorEvaluation.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#003DA5] hover:underline truncate flex-1 min-w-0">{currentStudent.documents.supervisorEvaluation.name}</a>
+                        <button type="button" onClick={() => handleDocRemove('supervisorEvaluation', currentStudent.documents.supervisorEvaluation.name)} className="text-slate-400 hover:text-red-600 flex-shrink-0" title="Remove">
+                          <Trash2 size={17} />
+                        </button>
+                      </div>
                     )}
                     {lockEval && (
                       <div className="mt-2 text-xs text-red-600 font-medium">Locked (Cut-off passed)</div>
                     )}
                   </div>
-                  <button 
-                    disabled={lockEval}
-                    onClick={() => updateStudentDocument(currentStudent.id, 'supervisorEvaluation', 'Supervisor_Eval.pdf')} 
-                    className="mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white disabled:opacity-50 text-xs font-semibold rounded transition text-slate-700"
-                  >
+                  <label className={`mt-4 py-2 bg-slate-100 hover:bg-[#003DA5] hover:text-white text-xs font-semibold rounded transition text-slate-700 text-center cursor-pointer ${lockEval ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input type="file" className="hidden" disabled={lockEval} onChange={(e) => handleDocUpload(e, 'supervisorEvaluation')} accept=".pdf,.doc,.docx,image/*" />
                     {lockEval ? 'Locked' : 'Upload Evaluation'}
-                  </button>
+                  </label>
                 </div>
               </div>
             </div>
@@ -529,7 +706,7 @@ export const StudentDashboard = () => {
             <div className="text-xs text-slate-700 space-y-2 leading-relaxed">
               <p><strong>TO: THE HUMAN RESOURCE MANAGER</strong></p>
               <p>RE: STUDENT INDUSTRIAL TRAINING APPLICATION — {currentStudent?.name.toUpperCase()} ({currentStudent?.id})</p>
-              <p>This is to confirm that the student is registered full-time in the Diploma in Human Resource Management (DHRM) programme and is officially endorsed for a 12-week industrial placement.</p>
+              <p>This is to confirm that the student is registered full-time in the {PROGRAMME_NAMES[currentStudent?.program] || currentStudent?.program} ({currentStudent?.program}) programme and is officially endorsed for an industrial placement.</p>
             </div>
             <div className="mt-6 pt-4 border-t flex justify-end">
               <button onClick={() => setShowSalModal(false)} className="bg-[#003DA5] text-white px-4 py-1.5 text-xs font-bold rounded-lg">Close</button>
