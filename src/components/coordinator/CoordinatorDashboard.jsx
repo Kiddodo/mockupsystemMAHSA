@@ -3,9 +3,12 @@ import { useApp } from '../../context/AppContext';
 import { 
   Users, CheckCircle, Clock, Building2, Upload, FileSpreadsheet, 
   Lock, Unlock, Search, ShieldCheck, Mail, FolderOpen, AlertCircle,
-  Calendar, Check, SlidersHorizontal, ShieldAlert, Download, FileText, Trash2
+  Calendar, Check, SlidersHorizontal, ShieldAlert, Download, FileText, Trash2,
+  UserPlus
 } from 'lucide-react';
 import { ImportStudentModal } from './ImportStudentModal';
+import { AddStudentModal } from './AddStudentModal';
+import { AddSessionModal } from './AddSessionModal';
 
 export const CoordinatorDashboard = () => {
   const { 
@@ -20,6 +23,8 @@ export const CoordinatorDashboard = () => {
   const [selectedFolderStudent, setSelectedFolderStudent] = useState(null);
   const [emailModalStudent, setEmailModalStudent] = useState(null);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [showAddSessionModal, setShowAddSessionModal] = useState(false);
   const [deadlineTab, setDeadlineTab] = useState('ALL'); // ALL, PHASE1, PHASE3, PHASE4
 
   // Statistics
@@ -55,21 +60,43 @@ export const CoordinatorDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-200 gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Coordinator Administration</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Active Session: <strong className="text-slate-700">{session}</strong> · Individual Submission Gating & Clearances
+          <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+            <span>Active Session: <strong className="text-slate-700">{session}</strong></span>
+            <button
+              type="button"
+              onClick={() => setShowAddSessionModal(true)}
+              className="text-xs font-semibold text-[#003DA5] hover:text-[#002d7a] bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition"
+              title="Add a new academic internship session"
+            >
+              + New Session
+            </button>
+            <span>·</span>
+            <span>Individual Submission Gating & Clearances</span>
           </p>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => setShowImportModal(true)}
+            type="button"
+            onClick={() => setShowAddStudentModal(true)}
             className="px-3 py-1.5 bg-[#003DA5] hover:bg-[#002d7a] text-white text-sm font-semibold rounded flex items-center gap-1.5 transition"
+            title="Register an individual student record"
+          >
+            <UserPlus size={15} />
+            <span>Add Student</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-semibold rounded flex items-center gap-1.5 transition"
+            title="Import student roster from CSV file"
           >
             <FileSpreadsheet size={15} />
             <span>Import Student CSV</span>
           </button>
           <button
+            type="button"
             onClick={() => showToast('Faculty templates uploaded to SharePoint repository.', 'info')}
             className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-semibold rounded flex items-center gap-1.5 transition"
           >
@@ -493,6 +520,18 @@ export const CoordinatorDashboard = () => {
       <ImportStudentModal
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
+      />
+
+      {/* Add Individual Student Modal */}
+      <AddStudentModal
+        isOpen={showAddStudentModal}
+        onClose={() => setShowAddStudentModal(false)}
+      />
+
+      {/* Add New Session Modal */}
+      <AddSessionModal
+        isOpen={showAddSessionModal}
+        onClose={() => setShowAddSessionModal(false)}
       />
     </div>
   );

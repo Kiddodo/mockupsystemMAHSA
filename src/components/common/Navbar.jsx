@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { LogOut, GraduationCap, ShieldCheck, User, Calendar, BookOpen, Layers } from 'lucide-react';
+import { AddSessionModal } from '../coordinator/AddSessionModal';
 
 export const Navbar = () => {
-  const { currentUser, setCurrentUser, session, setSession, selectedProgram, setSelectedProgram, currentStudent, approveBothClearances } = useApp();
+  const { 
+    currentUser, setCurrentUser, sessions, session, setSession, 
+    selectedProgram, setSelectedProgram, currentStudent, approveBothClearances 
+  } = useApp();
+
+  const [showAddSessionModal, setShowAddSessionModal] = useState(false);
 
   const handleLogout = () => {
     setCurrentUser(null);
@@ -60,11 +66,19 @@ export const Navbar = () => {
               <div className="flex items-center space-x-2">
                 <select
                   value={session}
-                  onChange={(e) => setSession(e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value === '__NEW__') {
+                      setShowAddSessionModal(true);
+                    } else {
+                      setSession(e.target.value);
+                    }
+                  }}
                   className="bg-[#002d7a] border border-blue-400/40 text-white text-xs rounded px-2.5 py-1 focus:outline-none"
                 >
-                  <option value="SEP2026">Session: Sept 2026</option>
-                  <option value="MAR2026">Session: Mar 2026</option>
+                  {sessions?.map(s => (
+                    <option key={s.id} value={s.id}>{s.label}</option>
+                  ))}
+                  <option value="__NEW__">+ Add New Session...</option>
                 </select>
                 <select
                   value={selectedProgram}
@@ -99,6 +113,12 @@ export const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Add New Session Modal */}
+      <AddSessionModal
+        isOpen={showAddSessionModal}
+        onClose={() => setShowAddSessionModal(false)}
+      />
     </nav>
   );
 };

@@ -99,9 +99,15 @@ const normalizeStudent = (s) => ({
   }
 });
 
+export const INITIAL_SESSIONS = [
+  { id: 'SEP2026', label: 'Session: Sept 2026', startDate: '2026-09-01', endDate: '2027-01-31' },
+  { id: 'MAR2026', label: 'Session: Mar 2026', startDate: '2026-03-01', endDate: '2026-07-31' }
+];
+
 export const AppProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [students, setStudents] = useState(isFirebaseEnabled ? [] : INITIAL_STUDENTS);
+  const [sessions, setSessions] = useState(INITIAL_SESSIONS);
   const [session, setSession] = useState('SEP2026');
   const [selectedProgram, setSelectedProgram] = useState('ALL');
   const [deadlines, setDeadlines] = useState(DEFAULT_SUBMISSION_DEADLINES);
@@ -461,6 +467,98 @@ export const AppProvider = ({ children }) => {
     return { addedCount, updatedCount };
   };
 
+  // Add individual student
+  const addStudent = (studentData) => {
+    if (!studentData?.id || !studentData?.name) {
+      showToast('Matric ID and Full Name are required.', 'warning');
+      return { success: false, message: 'Matric ID and Full Name are required.' };
+    }
+
+    const cleanId = studentData.id.trim();
+    const key = cleanId.toLowerCase();
+    const existing = students.find(s => s.id.trim().toLowerCase() === key);
+    if (existing) {
+      showToast(`Student with ID ${cleanId} already exists.`, 'warning');
+      return { success: false, message: `Student with ID ${cleanId} already exists.` };
+    }
+
+    const financeCleared = Boolean(studentData.financeCleared);
+    const facultyApproved = Boolean(studentData.facultyApproved);
+    const bothCleared = financeCleared && facultyApproved;
+    const phase = Number(studentData.phase) || (bothCleared ? 2 : 1);
+
+    const newStudent = normalizeStudent({
+      id: cleanId,
+      name: studentData.name.trim(),
+      program: (studentData.program || 'DHRM').toUpperCase().trim(),
+      cgpa: parseFloat(studentData.cgpa) || 3.00,
+      credits: parseInt(studentData.credits, 10) || 60,
+      company: studentData.company?.trim() || 'Pending Placement',
+      lecturer: studentData.lecturer?.trim() || 'Dr. Rahman',
+      session: studentData.session || session,
+      financeCleared,
+      facultyApproved,
+      phase1Submitted: true,
+      phase: phase,
+      stages: [1, bothCleared ? 1 : 0, 0, 0],
+      marks: null,
+      rubricScores: null,
+      feedback: null,
+      registrationData: {
+        icPassport: studentData.icPassport?.trim() || '',
+        phone: studentData.phone?.trim() || '',
+        email: studentData.email?.trim() || `${studentData.name.toLowerCase().replace(/[^a-z0-9]+/g, '.')}@student.mahsa.edu.my`,
+        preferredIndustry: studentData.preferredIndustry?.trim() || 'General Management',
+        preferredLocation: studentData.preferredLocation?.trim() || 'Kuala Lumpur / Selangor',
+        emergencyContact: studentData.emergencyContact?.trim() || ''
+      },
+      documents: {
+        salDownloaded: bothCleared,
+        offerLetter: null,
+        reportDuty: null,
+        logbook: null,
+        finalReport: null,
+        supervisorEvaluation: null
+      }
+    });
+
+    if (useFirebase) {
+      set(ref(db, `students/${studentKey(newStudent.id)}`), clean(newStudent))
+        .catch(err => showToast(`Failed to save to database: ${err.message}`, 'warning'));
+    } else {
+      setStudents(prev => [newStudent, ...prev]);
+    }
+
+    showToast(`Student ${newStudent.name} (${newStudent.id}) registered successfully!`, 'success');
+    return { success: true, student: newStudent };
+  };
+
+  // Add new academic session
+  const addSession = (sessionData) => {
+    if (!sessionData?.id || !sessionData?.label) {
+      showToast('Session Code and Label are required.', 'warning');
+      return false;
+    }
+
+    const cleanId = sessionData.id.trim().toUpperCase();
+    if (sessions.some(s => s.id === cleanId)) {
+      showToast(`Session ${cleanId} already exists.`, 'warning');
+      return false;
+    }
+
+    const newSession = {
+      id: cleanId,
+      label: sessionData.label.trim(),
+      startDate: sessionData.startDate || '',
+      endDate: sessionData.endDate || ''
+    };
+
+    setSessions(prev => [newSession, ...prev]);
+    setSession(cleanId);
+    showToast(`New session "${newSession.label}" created and activated!`, 'success');
+    return true;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -468,8 +566,10 @@ export const AppProvider = ({ children }) => {
         setCurrentUser,
         students,
         currentStudent,
+        sessions,
         session,
         setSession,
+        addSession,
         selectedProgram,
         setSelectedProgram,
         deadlines,
@@ -489,6 +589,7 @@ export const AppProvider = ({ children }) => {
         removeStudentDocument,
         submitStudentMarks,
         importStudents,
+        addStudent,
         dbStatus
       }}
     >
