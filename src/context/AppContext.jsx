@@ -335,7 +335,15 @@ export const AppProvider = ({ children }) => {
         }, advancePhaseTo);
         showToast(`${file.name} uploaded successfully.`, 'success');
       } catch (err) {
-        showToast(`Upload failed: ${err.message}`, 'warning');
+        console.error('Firebase Storage upload error:', err);
+        // Graceful fallback: show the file on screen so user testing isn't blocked
+        applyStudentDocument(studentId, docKey, {
+          name: file.name,
+          url: URL.createObjectURL(file),
+          size: file.size,
+          uploadedAt: new Date().toISOString()
+        }, advancePhaseTo);
+        showToast(`Saved locally only. (Enable Firebase Storage in Firebase Console for cloud upload)`, 'warning');
       }
       return;
     }
